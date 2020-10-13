@@ -14,7 +14,7 @@ Tutorial interactivo de Python en tu terminal.
 - Edita el código con tu editor de preferencia
 - Guardado de avance
 
-## Anti-Características
+## No-Características
 
 - No es un tutorial de web
 - No tiene soporte para móvil
@@ -22,6 +22,7 @@ Tutorial interactivo de Python en tu terminal.
 - No es un editor o IDE para Python
 - No soporta otros lenguajes
 - No es un remplazo de Jupyter Notebook
+- No es un libro o documento de referencia
 
 ## Ideas random a futuro
 

@@ -14,7 +14,7 @@ Tutorial interactivo de Python en tu terminal.
 - Edita el código con tu editor de preferencia
 - Guardado de avance
 
-## Anti-Características
+## No-Características
 
 - No es un tutorial de web
 - No tiene soporte para móvil

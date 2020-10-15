@@ -1,6 +1,8 @@
-# pylearn
+# lira
 
 Tutorial interactivo de Python en tu terminal.
+
+_Learn, Imagine, Repeat, Analize_
 
 ## Características
 

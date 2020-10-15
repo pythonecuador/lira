@@ -4,7 +4,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pylearn",
+    name="lira",
     version="0.0.1rc1",
     author="Python Ecuador",
     author_email="ecuadorpython@gmail.com",
@@ -13,7 +13,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    package_data={"pylearn": ["*.rst"]},
+    package_data={"lira": ["*.rst"]},
     install_requires=[],
     extras_require={"dev": ["black"], "tests": ["pytest"]},
     classifiers=[

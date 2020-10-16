@@ -4,6 +4,8 @@ Tutorial interactivo de Python en tu terminal.
 
 _Learn, Imagine, Repeat, Analize_
 
+**Este programa aún está en desarrollo, muchas cosas pueden cambiar**
+
 ## Características
 
 - Tutorial de línea de comandos (100% texto)

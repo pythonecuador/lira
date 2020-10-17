@@ -14,8 +14,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     package_data={"lira": ["*.rst"]},
-    install_requires=[],
-    extras_require={"dev": ["black"], "tests": ["pytest"]},
+    install_requires=[
+        "docutils==0.16",
+    ],
+    extras_require={"es": []},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

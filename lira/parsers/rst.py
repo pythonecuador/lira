@@ -11,6 +11,16 @@ from lira.parsers import nodes as booknodes
 
 class DirectiveNode(Element):
 
+    """
+    Node representation of a directive.
+
+    The attributes of this node are:
+
+    - name
+    - content
+    - options
+    """
+
     tagname = "directive"
 
 
@@ -21,6 +31,22 @@ def importable(value):
 
 class TestDirective(Directive):
 
+    """
+    Test directive implementation.
+
+    The first line of the directive is the description of it.
+    Options:
+
+    - help: Optional help text.
+    - validator: A dotted path to a subclass of `lira.validators.Validator`.
+
+    Example:
+
+    .. test:: Escribe un comentario
+       :help: Escribe un simple comentario :)
+       :validator: lira.validators.CommentValidator
+    """
+
     option_spec = {
         "help": str,
         "validator": importable,
@@ -28,6 +54,7 @@ class TestDirective(Directive):
     has_content = True
 
     def run(self):
+        """Returns a `DirectiveNode`, so it can be interpreted by the parser."""
         node = DirectiveNode(
             self.name,
             name=self.name,
@@ -38,6 +65,12 @@ class TestDirective(Directive):
 
 
 class RSTParser(BaseParser):
+
+    """
+    reStructuredText parser for lira.
+
+    Powered by docutils.
+    """
 
     terminal_nodes = {
         "#text": booknodes.Text,

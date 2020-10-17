@@ -1,36 +1,38 @@
 # lira
 
-Tutorial interactivo de Python en tu terminal.
+Python interactive tutorial in your terminal.
 
-_Learn, Imagine, Repeat, Analize_
+_Learn, Imagine, Repeat, Analyze_
 
-**Este programa aún está en desarrollo, muchas cosas pueden cambiar**
+**This program is still in development, many things can change**
 
-## Características
+## Features
 
-- Tutorial de línea de comandos (100% texto)
-- Multiplataforma
-- Fácil de instalar
-- Contenido para todos los niveles
-- Autocompletado (argumentos del programa)
-- Fácil de agregar nuevos tutoriales
-- Multi-idiomas, enfocado al español
-- Edita el código con tu editor de preferencia
-- Guardado de avance
+- Command line tutorial (100% text)
+- Multi platform
+- Easy to install
+- Content for all levels
+- Autocomplete (program arguments)
+- Easy to add new tutorials
+- Multi-languages, focused on Spanish
+- Edit the code with your preferred editor
+- Save youd advance
 
-## No-Características
+## No-Features
 
-- No es un tutorial de web
-- No tiene soporte para móvil
-- No tiene soporte para multiusuario
-- No es un editor o IDE para Python
-- No soporta otros lenguajes
-- No es un remplazo de Jupyter Notebook
-- No es un libro o documento de referencia
+- It is not a web tutorial
+- No mobile support
+- It does not have multi-user support
+- It is not an editor or IDE for Python
+- Does not support other languages
+- Not a replacement for Jupyter Notebook
+- It is not a reference document or book
 
-## Ideas random a futuro
+## Random ideas for the future
 
-- Compartir el score
-- Expandirse a otro tipo de tutoriales (física, matemática, estadística)
-- Modo contra reloj
-- Modo quiz
+- Multiple themes support
+- Plugins
+- Share your score
+- Expand to other types of tutorials (physics, math, statistics)
+- Against the clock mode
+- Quiz mode

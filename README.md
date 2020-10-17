@@ -2,7 +2,7 @@
 
 Python interactive tutorial in your terminal.
 
-_Learn, Imagine, Repeat, Analize_
+_Learn, Imagine, Repeat, Analyze_
 
 **This program is still in development, many things can change**
 

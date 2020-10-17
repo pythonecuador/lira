@@ -17,7 +17,7 @@ setuptools.setup(
     install_requires=[
         "docutils==0.16",
     ],
-    extras_require={"dev": ["black"], "tests": ["pytest"]},
+    extras_require={"tests": ["pytest"]},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from docutils.frontend import OptionParser
-from docutils.nodes import Element, Text
+from docutils.nodes import Element
 from docutils.parsers.rst import Directive, Parser, directives
 from docutils.utils import new_document
 

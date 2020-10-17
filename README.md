@@ -6,7 +6,7 @@ _Learn, Imagine, Repeat, Analyze_
 
 **This program is still in development, many things can change**
 
-## features
+## Features
 
 - Command line tutorial (100% text)
 - Multi platform
@@ -14,25 +14,25 @@ _Learn, Imagine, Repeat, Analyze_
 - Content for all levels
 - Autocomplete (program arguments)
 - Easy to add new tutorials
-- Multi-languages, focused on English
+- Multi-languages, focused on Spanish
 - Edit the code with your preferred editor
-- Advance Save
+- Save youd advance
 
-## Non-Features
+## No-Features
 
 - It is not a web tutorial
-- Does not have mobile support
+- No mobile support
 - It does not have multi-user support
 - It is not an editor or IDE for Python
 - Does not support other languages
 - Not a replacement for Jupyter Notebook
-- It is not a reference book or document
+- It is not a reference document or book
 
 ## Random ideas for the future
 
 - Multiple themes support
 - Plugins
-- Share the scores
+- Share your score
 - Expand to other types of tutorials (physics, math, statistics)
-- Time trial
+- Against the clock mode
 - Quiz mode

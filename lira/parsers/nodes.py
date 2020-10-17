@@ -136,10 +136,9 @@ class Section(Node):
 
 class Note(Node):
 
-    is_terminal = True
     valid_options = {"title"}
 
     def __str__(self):
         title = self.options["title"]
         content = self._trim_text(self.text())
-        return f"{self.tagname} ({title}): {content}"
+        return f"{self.tagname} ({title}): {self.children}"

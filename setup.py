@@ -17,7 +17,7 @@ setuptools.setup(
     install_requires=[
         "docutils==0.16",
     ],
-    extras_require={"es": []},
+    extras_require={"docs": ["sphinx==3.2.1"], "es": []},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

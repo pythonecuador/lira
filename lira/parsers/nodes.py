@@ -20,7 +20,8 @@ class Node:
         self.content = None
         self.children = []
         if self.is_terminal:
-            self.content = children[0]
+            if children:
+                self.content = children[0]
         else:
             self.children = list(children)
 
@@ -32,6 +33,12 @@ class Node:
                     f"Valid options are {self.valid_options}"
                 )
             self.options[option] = value
+
+    def _trim_text(self, text, max_len=30):
+        text = text.split("\n")[0]
+        if len(text) > max_len:
+            text = text[:max_len] + "..."
+        return text
 
     def append(self, node):
         """Append a node as a child of this node."""
@@ -56,10 +63,7 @@ class Node:
 
     def __str__(self):
         if self.is_terminal:
-            text = self.text()
-            max_len = 30
-            if len(text) > max_len:
-                text = text[:max_len] + "..."
+            text = self._trim_text(self.text())
             return f'{self.tagname}: "{text}"'
         return f"{self.tagname}: {self.children}"
 
@@ -92,15 +96,27 @@ class Paragraph(Node):
 
 
 class CodeBlock(Node):
-    pass
+
+    is_terminal = True
+    valid_options = {"language"}
+
+    def text(self):
+        return "\n".join(self.content)
+
+    def __str__(self):
+        lang = self.options["validator"]
+        code = self._trim_text(self.text())
+        return f"{lang}: {code}"
 
 
 class Prompt(Node):
-    pass
+
+    is_terminal = True
 
 
-class Test(Node):
+class TestBlock(Node):
 
+    is_terminal = True
     valid_options = {"validator", "help", "description"}
 
     def __str__(self):
@@ -119,4 +135,11 @@ class Section(Node):
 
 
 class Note(Node):
-    pass
+
+    is_terminal = True
+    valid_options = {"title"}
+
+    def __str__(self):
+        title = self.options["title"]
+        content = self._trim_text(self.text())
+        return f"{self.tagname} ({title}): {content}"

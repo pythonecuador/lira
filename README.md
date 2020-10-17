@@ -30,6 +30,8 @@ _Learn, Imagine, Repeat, Analize_
 
 ## Ideas random a futuro
 
+- Soporte de múltiple themes
+- Plugins
 - Compartir el score
 - Expandirse a otro tipo de tutoriales (física, matemática, estadística)
 - Modo contra reloj

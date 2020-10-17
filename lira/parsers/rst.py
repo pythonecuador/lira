@@ -7,6 +7,7 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
+from importlib.util import find_spec
 
 
 class DirectiveNode(Element):
@@ -14,16 +15,18 @@ class DirectiveNode(Element):
     tagname = "directive"
 
 
-def importable(value):
-    # TODO: check if value can be imported
-    return value
-
+def is_importable(value):
+    try:
+        find_spec(value)
+        return value
+    except:
+        raise ValueError
 
 class TestDirective(Directive):
 
     option_spec = {
         "help": str,
-        "validator": importable,
+        "validator": is_importable,
     }
     has_content = True
 

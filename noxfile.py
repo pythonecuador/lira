@@ -9,6 +9,13 @@ files = [
 
 
 @nox.session
+def tests(session):
+    session.install("pytest")
+    session.install("-e", ".")
+    session.run("pytest", "tests")
+
+
+@nox.session
 def lint(session):
     session.install("black", "flake8", "isort")
     session.run("black", "--check", *files)

@@ -29,7 +29,28 @@ def importable(value):
     return value
 
 
-class TestDirective(Directive):
+class BaseDirective(Directive):
+    def run(self):
+        """Returns a `DirectiveNode`, so it can be interpreted by the parser."""
+        node = DirectiveNode(
+            self.name,
+            name=self.name,
+            arguments=self.arguments,
+            content=self.content,
+            options=self.options,
+        )
+        return [node]
+
+
+class CodeBlockDirective(BaseDirective):
+
+    """Override the code directive to return a Directive node."""
+
+    has_content = True
+    required_arguments = 1
+
+
+class TestBlockDirective(BaseDirective):
 
     """
     Test directive implementation.
@@ -42,8 +63,8 @@ class TestDirective(Directive):
 
     Example:
 
-    .. test:: Escribe un comentario
-       :help: Escribe un simple comentario :)
+    .. test:: Write a comment
+       :help: Just write a simple comment :)
        :validator: lira.validators.CommentValidator
     """
 
@@ -52,16 +73,6 @@ class TestDirective(Directive):
         "validator": importable,
     }
     has_content = True
-
-    def run(self):
-        """Returns a `DirectiveNode`, so it can be interpreted by the parser."""
-        node = DirectiveNode(
-            self.name,
-            name=self.name,
-            content=self.content,
-            options=self.options,
-        )
-        return [node]
 
 
 class RSTParser(BaseParser):
@@ -93,7 +104,8 @@ class RSTParser(BaseParser):
         with file.open() as f:
             input = f.read()
 
-        directives.register_directive("test", TestDirective)
+        directives.register_directive("test-block", TestBlockDirective)
+        directives.register_directive("code-block", CodeBlockDirective)
         parser.parse(input, document)
         return document
 
@@ -119,36 +131,42 @@ class RSTParser(BaseParser):
             tag = child.tagname
             if tag == "section":
                 nodes.append(self._parse_section(child))
-            if tag == "directive" and child.attributes.get("name") == "test":
-                nodes.append(self._parse_test(child))
+            if tag == "directive":
+                directive_name = child.attributes.get("name")
+                if directive_name == "test-block":
+                    nodes.append(self._parse_test(child))
+                elif directive_name == "code-block":
+                    nodes.append(self._parse_code(child))
             if tag in self.terminal_nodes:
                 nodes.append(self.terminal_nodes[tag](child.astext()))
             elif tag in self.container_nodes:
                 nodes.append(self.container_nodes[tag](*self._parse_content(child)))
         return nodes
 
+    def _parse_code(self, node):
+        attrs = node.attributes
+        language = attrs["arguments"][0]
+        code = list(attrs["content"])
+        return booknodes.CodeBlock(
+            code,
+            language=language,
+        )
+
     def _parse_test(self, node):
-        if node.tagname != "directive" or node.attributes.get("name") != "test":
-            raise TypeError
         attrs = node.attributes
         description = attrs["content"][0]
         options = attrs["options"]
         help = options.get("help", "")
         validator = options["validator"]
-        directive = booknodes.Test(
+        return booknodes.TestBlock(
             validator=validator,
             description=description,
             help=help,
         )
-        return directive
 
     def _parse_section(self, node):
-        if node.tagname != "section":
-            raise TypeError
-
         title = node.children[0].astext()
-        section = booknodes.Section(
+        return booknodes.Section(
             *self._parse_content(node, start=1),
             title=title,
         )
-        return section

@@ -20,7 +20,8 @@ class Node:
         self.content = None
         self.children = []
         if self.is_terminal:
-            self.content = children[0]
+            if children:
+                self.content = children[0]
         else:
             self.children = list(children)
 
@@ -99,6 +100,9 @@ class CodeBlock(Node):
     is_terminal = True
     valid_options = {"language"}
 
+    def text(self):
+        return "\n".join(self.content)
+
     def __str__(self):
         lang = self.options["validator"]
         code = self._trim_text(self.text())
@@ -110,7 +114,7 @@ class Prompt(Node):
     is_terminal = True
 
 
-class Test(Node):
+class TestBlock(Node):
 
     is_terminal = True
     valid_options = {"validator", "help", "description"}

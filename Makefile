@@ -14,4 +14,4 @@ clean:
 publish: clean
 	python -m pip install --upgrade pip setuptools twine
 	python setup.py sdist bdist_wheel
-	python -m twine upload  dist/*
+	python -m twine upload dist/*

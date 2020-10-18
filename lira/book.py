@@ -14,6 +14,17 @@ class Book:
     - `content`: list of nodes from `lira.parsers.nodes`.
 
     Currently, the RSTParser is used by default.
+
+
+    .. code:: python
+
+       from pathlib import Path
+       from lira.book import Book
+
+       book = Book(Path('intro.rst'))
+       book.parse()
+       print(book.metadata)
+       print(book.content)
     """
 
     def __init__(self, file: Path):

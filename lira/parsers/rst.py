@@ -26,11 +26,11 @@ class DirectiveNode(Element):
 
 
 def is_importable(value):
-    try:
-        find_spec(value)
-        return value
-    except:
+
+    if find_spec('lira', value) is None:
         raise ValueError
+    else:
+        return value
 
 class BaseDirective(Directive):
     def run(self):

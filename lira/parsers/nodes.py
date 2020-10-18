@@ -140,5 +140,4 @@ class Note(Node):
 
     def __str__(self):
         title = self.options["title"]
-        content = self._trim_text(self.text())
         return f"{self.tagname} ({title}): {self.children}"

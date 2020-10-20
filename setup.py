@@ -16,6 +16,7 @@ setuptools.setup(
     package_data={"lira": ["*.rst"]},
     install_requires=[
         "docutils==0.16",
+        "PyYAML==5.3.1",
     ],
     extras_require={"docs": ["sphinx==3.2.1"], "es": []},
     classifiers=[

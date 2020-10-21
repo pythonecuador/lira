@@ -5,6 +5,7 @@ files = [
     "tests",
     "setup.py",
     "noxfile.py",
+    "docs/conf.py",
 ]
 
 
@@ -28,3 +29,10 @@ def format(session):
     session.install("black", "isort")
     session.run("black", *files)
     session.run("isort", *files)
+
+
+@nox.session
+def docs(session):
+    session.install("-e", ".[docs]")
+    session.cd("docs")
+    session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")

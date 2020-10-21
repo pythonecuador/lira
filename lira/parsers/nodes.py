@@ -3,9 +3,6 @@ class Node:
     """
     Base class for a node.
 
-    - `is_terminal`: If it's a terminal node (without children).
-    - `valid_options`: A set of valid options for this node.
-
     If it's a terminal node, the first argument is the text of this node,
     otherwise the arguments are the children of this node.
 
@@ -14,18 +11,27 @@ class Node:
     """
 
     is_terminal = False
+    """If it's a terminal node (without children)"""
+
     valid_options = set()
+    """A set of valid options for this node"""
 
     def __init__(self, *children, **options):
         self.content = None
+        """Raw content of the node"""
+
         self.children = []
+        """List of children of this node"""
+
+        self.options = {}
+        """Dictionary of options for this node"""
+
         if self.is_terminal:
             if children:
                 self.content = children[0]
         else:
             self.children = list(children)
 
-        self.options = {}
         for option, value in options.items():
             if option not in self.valid_options:
                 raise ValueError(

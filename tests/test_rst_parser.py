@@ -7,7 +7,13 @@ books_path = Path(__file__).parent / "data/books"
 
 class TestRSTParser:
     def setup_method(self):
-        self.parser = RSTParser(books_path / "example/intro.rst")
+        file = books_path / "example/intro.rst"
+        with file.open() as f:
+            content = f.read()
+        self.parser = RSTParser(
+            content=content,
+            source=file,
+        )
 
     def test_parse_metadata(self):
         metadata = self.parser.parse_metadata()

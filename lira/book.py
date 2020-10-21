@@ -10,13 +10,10 @@ class BookChapter:
     """
     Class representation of a chapter.
 
-    The `parse` method should be called to initialize its attributes
+    The :py:meth:`parse` method should be called to initialize the :py:attr:`metadata`
+    and :py:attr:`contents` attributes.
 
-    - `metadata`: dictionary with the metadata from the book.
-    - `contents`: list of nodes from `lira.parsers.nodes`.
-
-    Currently, the RSTParser is used by default.
-
+    Currently, the :py:class:`lira.parsers.rst.RSTParser` parser is used by default.
 
     .. code:: python
 
@@ -28,24 +25,28 @@ class BookChapter:
        print(chapter.metadata)
        print(chapter.contents)
        print(chapter.toc())
+
+    :param file: File of the chapter
+    :param title: Title of the chapter (defaults to the name of the file)
     """
 
     def __init__(self, *, file: Path, title: str = None):
         self.file = file
         self.title = title or file.name
-        self.parser = RSTParser(file)
+
         self.metadata = {}
+        """Dictionary with the metadata from the book"""
+
         self.contents = []
+        """List of nodes from :py:mod:`lira.parsers.nodes`"""
 
     def parse(self):
-        """
-        Parse the chapter content and initialize its attributes.
-
-        This method should be called before accessing the
-        `metadata` or `contents` attributes.
-        """
-        self.metadata = self.parser.parse_metadata()
-        self.contents = self.parser.parse_content()
+        """Parse the chapter content and initialize its attributes."""
+        with self.file.open() as f:
+            content = f.read()
+        parser = RSTParser(content=content, source=self.file)
+        self.metadata = parser.parse_metadata()
+        self.contents = parser.parse_content()
 
     def toc(self, depth=2):
         """
@@ -78,10 +79,8 @@ class Book:
     """
     Class representation of a lira book.
 
-    The `parse` method should be called to initialize its attributes
-
-    - `metadata`: dictionary with the metadata from the book.
-    - `chapters`: list of `BookChapter` instances.
+    The :py:meth:`parse` method should be called to initialize the :py:attr:`metadata`
+    and :py:attr:`chapters` attributes.
 
     .. code:: python
 
@@ -92,6 +91,8 @@ class Book:
        book.parse()
        print(chapter.metadata)
        print(chapter.chapters)
+
+    :param root: Path to the root directory of the book
     """
 
     meta_spec = {
@@ -105,16 +106,21 @@ class Book:
     }
     meta_file = "book.yaml"
 
-    def __init__(self, *, module: str = None, path: Path = None):
-        if (module and path) or (not module and not path):
-            raise ValueError
-        # TODO: handle a module too
-        self.path = path
-        self.root = path
-        self.metadata = {}
-        self.chapters = []
+    def __init__(self, root: Path):
+        self.root = root
 
-    def parse(self, all=False):
+        self.metadata = {}
+        """Dictionary with the metadata from the book"""
+
+        self.chapters = []
+        """List of :py:class:`lira.book.BookChapter` instances"""
+
+    def parse(self, all: bool = False):
+        """
+        Parse the book metadata.
+
+        :param all: If `True` all chapters are parsed as well
+        """
         self.metadata = self._parse_metadata()
         self.chapters = self._parse_chapters(
             self.metadata["contents"], parse_chapter=all

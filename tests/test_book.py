@@ -7,7 +7,7 @@ books_path = Path(__file__).parent / "data/books"
 
 class TestBook:
     def setup_method(self):
-        self.book = Book(path=books_path / "example")
+        self.book = Book(root=books_path / "example")
 
     def test_book_metadata(self):
         self.book.parse()
@@ -44,7 +44,7 @@ class TestBook:
 
 class TestBookChapter:
     def setup_method(self):
-        self.book = Book(path=books_path / "example")
+        self.book = Book(root=books_path / "example")
         self.book.parse(all=True)
         self.chapter_one = self.book.chapters[0]
         self.chapter_two = self.book.chapters[1]

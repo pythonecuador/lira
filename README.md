@@ -14,7 +14,7 @@ _Learn, Imagine, Repeat, Analyze_
 - Content for all levels
 - Autocomplete (program arguments)
 - Easy to add new tutorials
-- Multi-languages
+- Multi-languages (i18n)
 - Edit the code with your preferred editor
 - Save your advance
 
@@ -24,6 +24,6 @@ _Learn, Imagine, Repeat, Analyze_
 - No mobile support
 - It does not have multi-user support
 - It is not an editor or IDE for Python
-- Does not support other languages
+- Does not support other programming languages
 - Not a replacement for Jupyter Notebook
 - It is not a reference document or book

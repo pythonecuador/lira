@@ -1,5 +1,10 @@
 # lira
 
+[![Documentation Status](https://readthedocs.org/projects/lira/badge/?version=latest)](https://lira.python.ec/en/latest/?badge=latest)
+[![codecov.io](https://codecov.io/github/pythonecuador/lira/coverage.svg?branch=master)](https://codecov.io/github/pythonecuador/lira?branch=master)
+![tests](https://github.com/pythonecuador/lira/workflows/tests/badge.svg)
+[![PyPI version](https://badge.fury.io/py/lira.svg)](https://badge.fury.io/py/lira)
+
 Python interactive tutorial in your terminal.
 
 _Learn, Imagine, Repeat, Analyze_

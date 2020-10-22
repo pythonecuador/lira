@@ -13,8 +13,8 @@ Python interactive tutorial in your terminal.
    :maxdepth: 2
    :caption: Contents:
 
-   modules/book.rst
-   modules/parser.rst
+   development.rst
+   modules/index.rst
 
 Features
 --------

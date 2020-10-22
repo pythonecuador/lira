@@ -48,10 +48,11 @@ and execute the task with ``python -m nox -s <task>``.
 
 Before sending a pull request,
 make sure to run the formatter,
-and see if the linter and tests are passing.
+and see if the linter, tests, and coverage are passing.
 
 .. code-block::
 
    make format
    make lint
    make tests
+   make coverage

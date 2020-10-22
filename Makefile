@@ -1,6 +1,9 @@
 test:
 	python -m nox -r -s tests
 
+coverage:
+	python -m nox -r -s coverage
+
 lint:
 	python -m nox -r -s lint
 

@@ -30,4 +30,4 @@ jobs:
     - name: Run linter
       run: nox -s lint
     - name: Run tests
-      run: nox -s tests
+      run: nox -s tests coverage

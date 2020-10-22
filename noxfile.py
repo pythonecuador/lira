@@ -11,9 +11,16 @@ files = [
 
 @nox.session
 def tests(session):
-    session.install("pytest")
+    session.install("coverage", "pytest")
     session.install("-e", ".")
-    session.run("pytest", "tests")
+    session.run("coverage", "run", "-m", "pytest", "tests")
+
+
+@nox.session
+def coverage(session):
+    session.install("coverage")
+    session.run("coverage", "report", "--fail-under", "86")
+    session.run("coverage", "html")
 
 
 @nox.session

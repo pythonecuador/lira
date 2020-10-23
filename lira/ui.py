@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from prompt_toolkit.application import Application
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
@@ -5,7 +7,6 @@ from prompt_toolkit.layout.containers import HSplit, VSplit, Window
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.widgets import Label, TextArea
 
-from pathlib import Path
 from lira.book import Book
 
 
@@ -19,6 +20,7 @@ def get_key_bindings():
         event.app.exit()
 
     return keys
+
 
 themes = {
     "default": {
@@ -57,22 +59,20 @@ sections = {
 
 
 class TerminalUI:
-    theme = "default"
-
-    path = Path("../tests/data/books/example/")
-    book = Book(root=path)
-    book.parse()
-
-    chapters = book.chapters[1]
-    chapters.parse()
-
-
     def __init__(self):
+        path = Path("../tests/data/books/example/")
+        book = Book(root=path)
+        book.parse()
+
+        chapters = book.chapters[1]
+        chapters.parse()
+
+        self.theme = "default"
         sections_list = []
         for section in ["text", "prompt"]:
             sections_list.append(sections[section])
 
-        contents = self.chapters.contents[0]
+        contents = chapters.contents[0]
         render = self.get_label(contents)
         label = Label(merge_formatted_text(render))
 
@@ -117,5 +117,4 @@ class TerminalUI:
 
 if __name__ == "__main__":
     ui = TerminalUI()
-    ui.theme = "default"
     ui.run()

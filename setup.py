@@ -17,6 +17,7 @@ setuptools.setup(
     install_requires=[
         "docutils==0.16",
         "PyYAML==5.3.1",
+        "prompt-toolkit==3.0.7",
     ],
     extras_require={"docs": ["sphinx==3.2.1"], "es": []},
     classifiers=[

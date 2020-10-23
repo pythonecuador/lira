@@ -16,7 +16,7 @@ def get_key_bindings():
     @keys.add("c-c")
     @keys.add("c-q")
     def _(self, event):
-        " Pressing Ctrl-Q or Ctrl-C will exit the user interface."
+        "Pressing Ctrl-Q or Ctrl-C will exit the user interface."
         event.app.exit()
 
     return keys
@@ -60,17 +60,16 @@ sections = {
 
 class TerminalUI:
     def __init__(self):
-        path = Path("../tests/data/books/example/")
-        book = Book(root=path)
-        book.parse()
-
-        chapters = book.chapters[1]
-        chapters.parse()
-
         self.theme = "default"
         sections_list = []
         for section in ["text", "prompt"]:
             sections_list.append(sections[section])
+
+        path = Path("../tests/data/books/example/")
+        book = Book(root=path)
+        book.parse()
+        chapters = book.chapters[1]
+        chapters.parse()
 
         contents = chapters.contents[0]
         render = self.get_label(contents)
@@ -91,7 +90,6 @@ class TerminalUI:
         )
 
     def get_label(self, contents):
-
         render = []
         for node in contents.children:
             if node.is_terminal:
@@ -99,7 +97,7 @@ class TerminalUI:
                 style = node.tagname
                 render.append(to_formatted_text(text, styles[style]))
             else:
-                render += self.get_label(node)
+                render.extend(self.get_label(node))
         render.append(to_formatted_text("\n", ""))
 
         return render

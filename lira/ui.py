@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from prompt_toolkit.application import Application
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
@@ -59,13 +57,12 @@ sections = {
 
 
 class TerminalUI:
-    def __init__(self):
+    def __init__(self, path):
         self.theme = "default"
         sections_list = []
         for section in ["text", "prompt"]:
             sections_list.append(sections[section])
 
-        path = Path("../tests/data/books/example/")
         book = Book(root=path)
         book.parse()
         chapters = book.chapters[1]
@@ -111,8 +108,3 @@ class TerminalUI:
         )
 
         self.app.run()
-
-
-if __name__ == "__main__":
-    ui = TerminalUI()
-    ui.run()

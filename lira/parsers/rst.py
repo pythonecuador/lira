@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from docutils.frontend import OptionParser
 from docutils.nodes import Element
 from docutils.parsers.rst import Directive, Parser, directives
@@ -93,20 +91,20 @@ class RSTParser(BaseParser):
         "paragraph": booknodes.Paragraph,
     }
 
-    def __init__(self, file: Path):
-        super().__init__(file)
-        self.document = self._parse_file(file)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.document = self._get_document(self.content)
 
-    def _parse_file(self, file: Path):
+    def _get_document(self, content):
         settings = OptionParser(components=(Parser,)).get_default_values()
-        parser = Parser()
-        document = new_document(str(file), settings)
-        with file.open() as f:
-            input = f.read()
-
         directives.register_directive("test-block", TestBlockDirective)
         directives.register_directive("code-block", CodeBlockDirective)
-        parser.parse(input, document)
+
+        parser = Parser()
+        source = str(self.source) if self.source else "lira-unknown-source"
+        document = new_document(source, settings)
+
+        parser.parse(content, document)
         return document
 
     def parse_metadata(self):

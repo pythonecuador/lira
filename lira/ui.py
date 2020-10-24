@@ -14,7 +14,7 @@ def get_key_bindings():
     @keys.add("c-c")
     @keys.add("c-q")
     def _(event):
-        "Pressing Ctrl-Q or Ctrl-C will exit the user interface."
+        """Pressing Ctrl-Q or Ctrl-C will exit the user interface."""
         event.app.exit()
 
     return keys

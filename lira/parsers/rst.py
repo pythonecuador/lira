@@ -34,7 +34,7 @@ def importable(value):
 
 class BaseDirective(Directive):
     def run(self):
-        """Returns a `DirectiveNode`, so it can be interpreted by the parser."""
+        """Return a `DirectiveNode`, so it can be interpreted by the parser."""
         node = DirectiveNode(
             self.name,
             name=self.name,

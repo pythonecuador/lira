@@ -1,0 +1,15 @@
+[pydocstyle]
+
+add_ignore =
+  # Don't check for missing docstrings in public objects
+  D100,D101,D102,D103,D104,D105,D106,D107,
+  # Allow D203
+  D211,
+  # Allow blank lines between a section header and its content
+  D412,
+
+add_select =
+  # Always start multiline docstring at the second line
+  D213,
+  # One line required before class docstring
+  D203,

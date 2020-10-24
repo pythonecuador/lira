@@ -1,3 +1,5 @@
+import logging
+
 from docutils.frontend import OptionParser
 from docutils.nodes import Element
 from docutils.parsers.rst import Directive, Parser, directives
@@ -5,6 +7,9 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
+
+# TODO: make a global logging config
+logger = logging.getLogger(__name__)
 
 
 class DirectiveNode(Element):
@@ -129,16 +134,18 @@ class RSTParser(BaseParser):
             tag = child.tagname
             if tag == "section":
                 nodes.append(self._parse_section(child))
-            if tag == "directive":
+            elif tag == "directive":
                 directive_name = child.attributes.get("name")
                 if directive_name == "test-block":
                     nodes.append(self._parse_test(child))
                 elif directive_name == "code-block":
                     nodes.append(self._parse_code(child))
-            if tag in self.terminal_nodes:
+            elif tag in self.terminal_nodes:
                 nodes.append(self.terminal_nodes[tag](child.astext()))
             elif tag in self.container_nodes:
                 nodes.append(self.container_nodes[tag](*self._parse_content(child)))
+            else:
+                logger.warning("Node with tag %(tag)s is not supported", {"tag": tag})
         return nodes
 
     def _parse_code(self, node):

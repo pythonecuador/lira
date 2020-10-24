@@ -7,7 +7,7 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
-from importlib.util import find_spec
+from importlib import import_module
 
 
 class DirectiveNode(Element):
@@ -27,10 +27,9 @@ class DirectiveNode(Element):
 
 def is_importable(value):
 
-    if find_spec('lira', value) is None:
-        raise ValueError
-    else:
-        return value
+    module_name, class_name = value.rsplit(".",1)
+    MyClass = getattr(importlib.import_module(module_name), class_name, ValueError)
+    instance = MyClass()
 
 class BaseDirective(Directive):
     def run(self):

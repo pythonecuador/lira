@@ -3,6 +3,10 @@ Development
 
 **Thanks** for the interest in contributing to Lira!
 
+This is a project from the community **Python Ecuador**
+
+- `Link to python.ec <link: https://python.ec/>`__
+
 Requirements:
 
 - Git

@@ -2,7 +2,7 @@ Lira
 ====
 
 Python interactive tutorial in your terminal.
-This is a project from the  `Python Ecuador <https://python.ec/>`__ community.
+This is a project from the `Python Ecuador <https://python.ec/>`__ community.
 
 *Learn, Imagine, Repeat, Analyze*
 

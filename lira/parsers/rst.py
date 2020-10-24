@@ -1,4 +1,5 @@
 import logging
+import importlib
 
 from docutils.frontend import OptionParser
 from docutils.nodes import Element
@@ -7,7 +8,6 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
-import importlib
 
 # TODO: make a global logging config
 logger = logging.getLogger(__name__)
@@ -28,7 +28,6 @@ class DirectiveNode(Element):
 
 
 def is_importable(value):
-
     module_name, class_name = value.rsplit(".",1)
     MyClass = getattr(importlib.import_module(module_name), class_name, ValueError)
     if MyClass is ValueError:

@@ -41,8 +41,9 @@ class Node:
             self.options[option] = value
 
     def _trim_text(self, text, max_len=30):
-        text = text.split("\n")[0]
-        if len(text) > max_len:
+        split = text.split("\n")
+        text = split[0]
+        if len(text) > max_len or len(split) > 1:
             text = text[:max_len] + "..."
         return text
 
@@ -70,38 +71,122 @@ class Node:
     def __str__(self):
         if self.is_terminal:
             text = self._trim_text(self.text())
-            return f'<{self.tagname}: "{text}>"'
+            return f'<{self.tagname}: "{text}">'
         return f"<{self.tagname}: {self.children}>"
 
     def __repr__(self):
         return str(self)
 
 
+class NestedNode(Node):
+    def text(self):
+        content = [child.text() for child in self.children]
+        return "\n\n".join(content)
+
+
+class Paragraph(Node):
+
+    """
+    Container for inline nodes.
+
+    Inline nodes are:
+
+    - :py:class:`Text`
+    - :py:class:`Strong`
+    - :py:class:`Emphasis`
+    - :py:class:`Literal`
+    """
+
+    def text(self):
+        content = [child.text() for child in self.children]
+        return "".join(content)
+
+
 class Text(Node):
+
+    """Plain text node."""
 
     is_terminal = True
 
 
 class Strong(Node):
 
+    """Text represented as **bold**."""
+
     is_terminal = True
 
 
 class Emphasis(Node):
+
+    """Text represented as *italics*."""
 
     is_terminal = True
 
 
 class Literal(Node):
 
+    """Text represented with a ``mono space font``."""
+
     is_terminal = True
 
 
-class Paragraph(Node):
-    pass
+class Section(NestedNode):
+
+    """
+    Section representation.
+
+    Options:
+
+    - title
+
+    Children can be any of:
+
+    - :py:class:`Paragraph`
+    - :py:class:`TestBlock`
+    - :py:class:`CodeBlock`
+    - :py:class:`Admonition`
+    """
+
+    valid_options = {"title"}
+
+    def __str__(self):
+        title = self.options["title"]
+        return f"<{self.tagname} {title}: {self.children}>"
+
+
+class Admonition(NestedNode):
+
+    """
+    Text inside a box, usually to give a warning or a note to the user.
+
+    Options:
+
+    - title: The title of the admonition, defaults to ``type``.
+    - type: one of ``note``, ``warning``, or ``tip``.
+
+    Children can be any of:
+
+    - :py:class:`Paragraph`
+    """
+
+    valid_options = {"title", "type"}
+
+    def __str__(self):
+        title = self.options["title"]
+        return f"<{self.tagname} {title}: {self.children}>"
 
 
 class CodeBlock(Node):
+
+    """
+    Syntax highlighted block.
+
+    The content of this node should be a list of lines.
+
+    Options:
+
+    - language
+    """
 
     is_terminal = True
     valid_options = {"language"}
@@ -115,15 +200,23 @@ class CodeBlock(Node):
         return f"<{self.tagname} {lang}: {code}>"
 
 
-class Prompt(Node):
-
-    is_terminal = True
-
-
 class TestBlock(Node):
+
+    """
+    Challenge/response block to interact with the user.
+
+    Options:
+
+    - validator: dotted path to a :py:class:`lira.validator.Validator` class.
+    - description
+    - help
+    """
 
     is_terminal = True
     valid_options = {"validator", "help", "description"}
+
+    def text(self):
+        return self.options["description"]
 
     def __str__(self):
         description = self.options["description"]
@@ -131,19 +224,8 @@ class TestBlock(Node):
         return f"<{self.tagname} {validator}: {description}>"
 
 
-class Section(Node):
+class Prompt(Node):
 
-    valid_options = {"title"}
+    # TODO
 
-    def __str__(self):
-        title = self.options["title"]
-        return f"<{self.tagname} {title}: {self.children}>"
-
-
-class Note(Node):
-
-    valid_options = {"title"}
-
-    def __str__(self):
-        title = self.options["title"]
-        return f"<{self.tagname} {title}: {self.children}>"
+    is_terminal = True

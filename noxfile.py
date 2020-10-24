@@ -13,7 +13,7 @@ files = [
 def tests(session):
     session.install("coverage", "pytest")
     session.install("-e", ".")
-    session.run("coverage", "run", "-m", "pytest", "tests")
+    session.run("coverage", "run", "-m", "pytest", "tests", *session.posargs)
 
 
 @nox.session
@@ -25,10 +25,11 @@ def coverage(session):
 
 @nox.session
 def lint(session):
-    session.install("black", "flake8", "isort")
+    session.install("black", "flake8", "isort", "pydocstyle")
+    session.run("flake8", *files)
     session.run("black", "--check", *files)
     session.run("isort", "--check", *files)
-    session.run("flake8", *files)
+    session.run("pydocstyle", *files)
 
 
 @nox.session

@@ -1,4 +1,5 @@
 class Validator:
+
     """Base class for validators."""
 
     def __init__(self):

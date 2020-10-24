@@ -2,6 +2,7 @@ from pathlib import Path
 
 
 class BaseParser:
+
     """
     Base class for a parser.
 

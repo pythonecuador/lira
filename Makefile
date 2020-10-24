@@ -1,4 +1,4 @@
-test:
+tests:
 	python -m nox -r -s tests
 
 coverage:
@@ -22,4 +22,4 @@ publish: clean
 	python setup.py sdist bdist_wheel
 	python -m twine upload dist/*
 
-.PHONY: test lint format docs clean publish
+.PHONY: tests lint format docs clean publish coverage

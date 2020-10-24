@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "lira"
+project = "Lira"
 copyright = "2020, Python Ecuador"
 author = "Santos Gallegos, Sebastian Moscoso"
 

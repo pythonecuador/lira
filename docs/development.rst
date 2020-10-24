@@ -1,7 +1,7 @@
 Development
 ===========
 
-**Thanks** for the interest in contributing to lira!
+**Thanks** for the interest in contributing to Lira!
 
 Requirements:
 

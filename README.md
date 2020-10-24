@@ -1,4 +1,4 @@
-# lira
+# Lira
 
 [![Documentation Status](https://readthedocs.org/projects/lira/badge/?version=latest)](https://lira.python.ec/en/latest/?badge=latest)
 [![codecov.io](https://codecov.io/github/pythonecuador/lira/coverage.svg?branch=master)](https://codecov.io/github/pythonecuador/lira?branch=master)

@@ -1,10 +1,15 @@
 # lira
 
+[![Documentation Status](https://readthedocs.org/projects/lira/badge/?version=latest)](https://lira.python.ec/en/latest/?badge=latest)
+[![codecov.io](https://codecov.io/github/pythonecuador/lira/coverage.svg?branch=master)](https://codecov.io/github/pythonecuador/lira?branch=master)
+[![tests](https://github.com/pythonecuador/lira/workflows/tests/badge.svg)](https://github.com/pythonecuador/lira/actions?query=workflow%3Atests+branch%3Amaster)
+[![PyPI version](https://badge.fury.io/py/lira.svg)](https://pypi.org/project/lira/)
+
 Python interactive tutorial in your terminal.
 
 _Learn, Imagine, Repeat, Analyze_
 
-**This program is still in development, many things can change**
+**This program is still under development, many things may change!**
 
 ## Features
 
@@ -14,9 +19,9 @@ _Learn, Imagine, Repeat, Analyze_
 - Content for all levels
 - Autocomplete (program arguments)
 - Easy to add new tutorials
-- Multi-languages, focused on Spanish
+- Multi-languages (i18n)
 - Edit the code with your preferred editor
-- Save youd advance
+- Save your advance
 
 ## No-Features
 
@@ -24,15 +29,6 @@ _Learn, Imagine, Repeat, Analyze_
 - No mobile support
 - It does not have multi-user support
 - It is not an editor or IDE for Python
-- Does not support other languages
+- Does not support other programming languages
 - Not a replacement for Jupyter Notebook
 - It is not a reference document or book
-
-## Random ideas for the future
-
-- Multiple themes support
-- Plugins
-- Share your score
-- Expand to other types of tutorials (physics, math, statistics)
-- Against the clock mode
-- Quiz mode

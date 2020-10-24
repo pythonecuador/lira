@@ -5,14 +5,22 @@ files = [
     "tests",
     "setup.py",
     "noxfile.py",
+    "docs/conf.py",
 ]
 
 
 @nox.session
 def tests(session):
-    session.install("pytest")
+    session.install("coverage", "pytest")
     session.install("-e", ".")
-    session.run("pytest", "tests")
+    session.run("coverage", "run", "-m", "pytest", "tests")
+
+
+@nox.session
+def coverage(session):
+    session.install("coverage")
+    session.run("coverage", "report", "--fail-under", "76")
+    session.run("coverage", "html")
 
 
 @nox.session
@@ -28,3 +36,10 @@ def format(session):
     session.install("black", "isort")
     session.run("black", *files)
     session.run("isort", *files)
+
+
+@nox.session
+def docs(session):
+    session.install("-e", ".[docs]")
+    session.cd("docs")
+    session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")

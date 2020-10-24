@@ -29,3 +29,10 @@ jobs:
         pip install nox
     - name: Run linter
       run: nox -s lint
+    - name: Run tests
+      run: nox -s tests coverage
+    - name: codecov
+      if: ${{ matrix.python-version == 3.9 }}
+      run: |
+        pip install coverage
+        curl -s https://codecov.io/bash | bash

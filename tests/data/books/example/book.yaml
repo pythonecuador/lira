@@ -7,4 +7,5 @@ authors:
   - Santos Gallegos
 
 contents:
-  - Introducción: intro.rst
+  Introducction: intro.rst
+  Nested Content: nested.rst

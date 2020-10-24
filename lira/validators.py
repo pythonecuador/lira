@@ -8,7 +8,7 @@ class Validator:
         """
         Validate the value.
 
-        Return `True` or `False` if the value is correct or not.
+        :returns: `True` or `False` if the value is correct or not.
         """
         raise NotImplementedError
 

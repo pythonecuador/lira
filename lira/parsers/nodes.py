@@ -3,9 +3,6 @@ class Node:
     """
     Base class for a node.
 
-    - `is_terminal`: If it's a terminal node (without children).
-    - `valid_options`: A set of valid options for this node.
-
     If it's a terminal node, the first argument is the text of this node,
     otherwise the arguments are the children of this node.
 
@@ -14,18 +11,27 @@ class Node:
     """
 
     is_terminal = False
+    """If it's a terminal node (without children)"""
+
     valid_options = set()
+    """A set of valid options for this node"""
 
     def __init__(self, *children, **options):
         self.content = None
+        """Raw content of the node"""
+
         self.children = []
+        """List of children of this node"""
+
+        self.options = {}
+        """Dictionary of options for this node"""
+
         if self.is_terminal:
             if children:
                 self.content = children[0]
         else:
             self.children = list(children)
 
-        self.options = {}
         for option, value in options.items():
             if option not in self.valid_options:
                 raise ValueError(
@@ -64,8 +70,8 @@ class Node:
     def __str__(self):
         if self.is_terminal:
             text = self._trim_text(self.text())
-            return f'{self.tagname}: "{text}"'
-        return f"{self.tagname}: {self.children}"
+            return f'<{self.tagname}: "{text}>"'
+        return f"<{self.tagname}: {self.children}>"
 
     def __repr__(self):
         return str(self)
@@ -104,9 +110,9 @@ class CodeBlock(Node):
         return "\n".join(self.content)
 
     def __str__(self):
-        lang = self.options["validator"]
+        lang = self.options["language"]
         code = self._trim_text(self.text())
-        return f"{lang}: {code}"
+        return f"<{self.tagname} {lang}: {code}>"
 
 
 class Prompt(Node):
@@ -122,7 +128,7 @@ class TestBlock(Node):
     def __str__(self):
         description = self.options["description"]
         validator = self.options["validator"]
-        return f"{validator}: {description}"
+        return f"<{self.tagname} {validator}: {description}>"
 
 
 class Section(Node):
@@ -131,15 +137,13 @@ class Section(Node):
 
     def __str__(self):
         title = self.options["title"]
-        return f"{self.tagname} ({title}): {self.children}"
+        return f"<{self.tagname} {title}: {self.children}>"
 
 
 class Note(Node):
 
-    is_terminal = True
     valid_options = {"title"}
 
     def __str__(self):
         title = self.options["title"]
-        content = self._trim_text(self.text())
-        return f"{self.tagname} ({title}): {content}"
+        return f"<{self.tagname} {title}: {self.children}>"

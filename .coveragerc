@@ -1,0 +1,9 @@
+[run]
+branch = True
+source =
+  lira/
+  tests/
+
+[report]
+exclude_lines =
+    raise NotImplementedError

@@ -1,4 +1,6 @@
+import logging
 from pathlib import Path
+from unittest.mock import patch
 
 from lira.parsers.rst import RSTParser
 
@@ -92,3 +94,13 @@ class TestRSTParser:
         assert testblock.options["description"] == "Write another comment"
         assert testblock.options["help"] == "Just write another comment :)"
         assert testblock.options["validator"] == "lira.validators.CommentValidator"
+
+    def test_parse_invalid_node(self):
+        logger = logging.getLogger("lira.parsers.rst")
+        with patch.object(logger, "warning") as mocked_logger:
+            parser = RSTParser(content=":title:`hello`\n", source="invalid_test")
+            parser.parse_content()
+            tag = "title_reference"
+            mocked_logger.assert_called_once_with(
+                "Node with tag %(tag)s is not supported", {"tag": tag}
+            )

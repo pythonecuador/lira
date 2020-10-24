@@ -29,7 +29,7 @@ class DirectiveNode(Element):
 
 def is_importable(value):
     module_name, class_name = value.rsplit(".",1)
-    MyClass = getattr(importlib.import_module(module_name), class_name, ValueError)
+    MyClass = getattr(importlib.import_module(module_name), class_name, None)
     if MyClass is ValueError:
         raise ValueError
     else:

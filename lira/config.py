@@ -25,5 +25,6 @@ def _get_data_dir():
 
 
 CONFIG_DIR = _get_config_dir()
+CONFIG_FILE = CONFIG_DIR / "config.yaml"
 DATA_DIR = _get_data_dir()
 LOG_DIR = DATA_DIR / "log"

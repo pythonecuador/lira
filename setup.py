@@ -19,6 +19,11 @@ setuptools.setup(
         "PyYAML==5.3.1",
         "prompt-toolkit==3.0.7",
     ],
+    entry_points={
+        "console_scripts": [
+            "lira=lira.__main__:main",
+        ],
+    },
     extras_require={"docs": ["sphinx==3.2.1"], "es": []},
     classifiers=[
         "Programming Language :: Python :: 3",

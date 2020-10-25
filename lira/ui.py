@@ -8,7 +8,6 @@ from prompt_toolkit.widgets import Label, TextArea
 from lira.book import Book
 
 
-from prompt_toolkit.application import Application
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
@@ -16,19 +15,22 @@ from prompt_toolkit.layout import HSplit, Layout, VSplit
 from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import Box, Button, Frame, Label, TextArea
 
-
-class Menu:
-    def __init__(self, path):
-        self.items = self.get_top_items()
-        self.buttons = self.make_buttons()
-
-        book = Book(root=path)
+'''
+        book = Book(root=root)
         book.parse()
         chapters = book.chapters
         for chapter in chapters:
             chapter.parse()
             print(chapter.title)
             print(chapter.toc())
+'''
+
+class Menu:
+    def __init__(self, root):
+        self.tuto = Tutorial()
+
+        self.items = self.get_top_items()
+        self.buttons = self.make_buttons()
 
 
     def get_top_items(self):
@@ -46,14 +48,19 @@ class Menu:
         buttons = []
 
         for item in self.items:
-            buttons.append(Button(item, handler=refresh_menu))
+            buttons.append(Button(item, handler=self.tuto.refresh))
 
         buttons.append(Button("Exit", handler=exit_clicked))
         return buttons
 
 
-def refresh_menu():
-    text_area.text = "Refresh Menu"
+class Tutorial:
+    def __init__(self):
+        self.text_area = TextArea(focusable=True)
+        self.text_area.text = "Refresh"
+
+    def refresh(self):
+        self.text_area.text = "Refresh Menu"
 
 
 def exit_clicked():
@@ -61,7 +68,6 @@ def exit_clicked():
 
 
 text_area = TextArea(focusable=True)
-
 
 
 style = Style(
@@ -138,12 +144,13 @@ class TerminalUI:
     def __init__(self, root):
         self.theme = "default"
         self.menu = Menu(root)
+        self.tuto = menu.tuto
 
         sections_list = []
         for section in ["text", "prompt"]:
             sections_list.append(sections[section])
 
-        book = Book(root=path)
+        book = Book(root=root)
         book.parse()
         chapters = book.chapters[1]
         chapters.parse()
@@ -156,10 +163,9 @@ class TerminalUI:
             [
                 VSplit(
                     [
-                        HSplit(self.menu.buttons, padding=1),
-                        sections["menu"],
+                        HSplit(self.menu.buttons, padding=1, height=40, width=25, style=styles["Text"]),
                         sections["vseparator"],
-                        HSplit([label, Box(height=20, width=80,  body=Frame(text_area), padding=1, style="class:right-pane")]),
+                        HSplit([label, Box(height=20, width=80,  body=Frame(self.tuto), padding=1, style="class:right-pane")]),
                     ]
                 ),
                 sections["hseparator"],

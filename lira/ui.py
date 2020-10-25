@@ -17,26 +17,49 @@ from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import Box, Button, Frame, Label, TextArea
 
 
-def button1_clicked():
-    text_area.text = "Python Tutorial"
+class Menu:
+    def __init__(self, path):
+        self.items = self.get_top_items()
+        self.buttons = self.make_buttons()
+
+        book = Book(root=path)
+        book.parse()
+        chapters = book.chapters
+        for chapter in chapters:
+            chapter.parse()
+            print(chapter.title)
+            print(chapter.toc())
 
 
-def button2_clicked():
-    text_area.text = "Clean Code"
+    def get_top_items(self):
+        """Return the list of items on top of the current menu item"""
+        return ['PyTutorial', 'Clean Code', 'TDD', 'top']
 
 
-def button3_clicked():
-    text_area.text = "TDD"
+    def get_nested_items(self):
+        """Return the list of items nested on the current menu item"""
+        return ['PyTutorial', 'Clean Code', 'TDD', 'nested']
+
+
+    def make_buttons(self):
+        """Return a list of buttons from  a list of items"""
+        buttons = []
+
+        for item in self.items:
+            buttons.append(Button(item, handler=refresh_menu))
+
+        buttons.append(Button("Exit", handler=exit_clicked))
+        return buttons
+
+
+def refresh_menu():
+    text_area.text = "Refresh Menu"
 
 
 def exit_clicked():
     get_app().exit()
 
 
-button1 = Button("Python Tutorial", handler=button1_clicked)
-button2 = Button("Clean Code", handler=button2_clicked)
-button3 = Button("TDD", handler=button3_clicked)
-button4 = Button("Exit", handler=exit_clicked)
 text_area = TextArea(focusable=True)
 
 
@@ -112,8 +135,10 @@ sections = {
 
 
 class TerminalUI:
-    def __init__(self, path):
+    def __init__(self, root):
         self.theme = "default"
+        self.menu = Menu(root)
+
         sections_list = []
         for section in ["text", "prompt"]:
             sections_list.append(sections[section])
@@ -131,7 +156,7 @@ class TerminalUI:
             [
                 VSplit(
                     [
-                        HSplit([button1, button2, button3, button4], padding=1),
+                        HSplit(self.menu.buttons, padding=1),
                         sections["menu"],
                         sections["vseparator"],
                         HSplit([label, Box(height=20, width=80,  body=Frame(text_area), padding=1, style="class:right-pane")]),

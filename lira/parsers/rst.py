@@ -29,11 +29,14 @@ class DirectiveNode(Element):
 
 def is_importable(value):
     module_name, class_name = value.rsplit(".",1)
-    MyClass = getattr(importlib.import_module(module_name), class_name, None)
-    if MyClass is ValueError:
+    try:
+        MyClass = getattr(importlib.import_module(module_name), class_name, None)
+        instance = MyClass()
+    return value
+
+    except ImportError:
+
         raise ValueError
-    else:
-        return value
 
 
 class BaseDirective(Directive):

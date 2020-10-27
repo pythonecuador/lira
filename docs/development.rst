@@ -13,6 +13,7 @@ Get the project:
 .. code-block:: bash
 
    git clone https://github.com/pythonecuador/lira
+   cd lira
 
 Create a virtual environment:
 

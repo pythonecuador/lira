@@ -27,3 +27,10 @@ class TestApp:
         assert book_b.metadata["title"] == "Basic Introducction to Python"
         book_path = data_dir / "books/example"
         assert book_b.root == book_path
+
+    @mock.patch("lira.app.CONFIG_FILE", config_file)
+    def test_cached_property(self):
+        app = LiraApp()
+        app.setup()
+        books = app.books
+        assert books == app.books

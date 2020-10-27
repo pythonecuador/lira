@@ -58,8 +58,12 @@ class LiraApp:
              - name: lira.book.basic
                package: pythones-lirabook
         """
+        cache_key = "__books"
+        books_list = getattr(self, cache_key, [])
+        if books_list:
+            return books_list
+
         config = self._read_config()
-        books_list = []
         for book_path in config.get("books", ["lira.books.intro"]):
             path = Path(book_path).expanduser()
             if not path.is_absolute():
@@ -80,6 +84,7 @@ class LiraApp:
                         book_path,
                         str(e),
                     )
+        setattr(self, cache_key, books_list)
         return books_list
 
     def setup(self):

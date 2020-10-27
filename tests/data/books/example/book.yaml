@@ -1,5 +1,5 @@
 language: en
-title: Basic Introducction to Python
+title: Basic Introduction to Python
 description: Basic introduction to Python
 created: 16/10/2020
 updated: 16/10/2020
@@ -7,5 +7,5 @@ authors:
   - Santos Gallegos
 
 contents:
-  Introducction: intro.rst
+  Introduction: intro.rst
   Nested Content: nested.rst

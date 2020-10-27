@@ -1,7 +1,7 @@
 Development
 ===========
 
-**Thanks** for the interest in contributing to lira!
+**Thanks** for the interest in contributing to Lira!
 
 Requirements:
 
@@ -13,6 +13,7 @@ Get the project:
 .. code-block:: bash
 
    git clone https://github.com/pythonecuador/lira
+   cd lira
 
 Create a virtual environment:
 

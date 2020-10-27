@@ -32,5 +32,5 @@ class TestApp:
     def test_cached_property(self):
         app = LiraApp()
         app.setup()
-        books is app.books
-        assert books == app.books
+        books = app.books
+        assert books is app.books

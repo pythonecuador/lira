@@ -32,7 +32,7 @@ Install the project locally with:
    pip install -e .
 
 Run ``python -m lira``,
-or check the docs about the :doc:`modules </modules/index>` to get familiar with the project.
+or check the docs about the :doc:`modules </modules/index>` to become familiar with the project.
 
 .. note::
 

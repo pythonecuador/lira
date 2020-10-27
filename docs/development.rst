@@ -1,6 +1,9 @@
 Development
 ===========
 
+Contributing
+------------
+
 **Thanks** for the interest in contributing to Lira!
 
 Requirements:
@@ -57,3 +60,40 @@ and see if the linter, tests, and coverage are passing.
    make lint
    make tests
    make coverage
+
+Roadmap
+-------
+
+Goals
+~~~~~
+
+- Command line tutorial (100% text)
+- Multi platform
+- Easy to install
+- Content for all levels
+- Autocomplete (program arguments)
+- Easy to add new tutorials
+- Multi-languages (i18n)
+- Edit the code with your favorite editor
+- Save your advance
+
+Non-Goals
+~~~~~~~~~
+
+- It is not a web tutorial
+- No mobile support
+- It does not have multi-user support
+- It is not an editor or IDE for Python
+- Does not support other languages
+- Not a replacement for Jupyter Notebook
+- It is not a reference document or book
+
+Random ideas for the future
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Multiple themes support
+- Plugins
+- Share your score
+- Expand to other types of tutorials (physics, math, statistics)
+- Against the clock mode
+- Quiz mode

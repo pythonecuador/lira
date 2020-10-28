@@ -11,6 +11,24 @@ log = logging.getLogger(__name__)
 
 
 class LiraApp:
+
+    """
+    Lira application.
+
+    This class is used to interact with Lira.
+    Before using this class you'll need to call to :py:method:`setup`.
+
+    If you want to refresh the options with the latest configuration,
+    call to :py:method:`load_config`.
+    """
+
+    def __init__(self):
+        self.config = {}
+        """Dictionary with the user configuration."""
+
+        self.books = []
+        """List of :py:class:`lira.book.Book`"""
+
     def _create_dirs(self):
         for dir in [CONFIG_DIR, DATA_DIR, LOG_DIR]:
             dir.mkdir(parents=True, exist_ok=True)
@@ -24,16 +42,25 @@ class LiraApp:
             level=logging.WARNING,
         )
 
-    def _read_config(self):
-        if not CONFIG_FILE.exists():
+    def _read_config(self, file):
+        if not file.exists():
             log.info("Config file not found")
             return {}
-        with CONFIG_FILE.open() as f:
+        with file.open() as f:
             config = yaml.safe_load(f)
         return config
 
-    @property
-    def books(self):
+    def load_config(self):
+        """
+        Load the user configuration into the app.
+
+        If called again, this method will refresh the configuration
+        with the latest changes.
+        """
+        self.config = self._read_config(CONFIG_FILE)
+        self.books = self._read_books(self.config)
+
+    def _read_books(self, config):
         """
         Load all books from the Lira configuration file.
 
@@ -58,7 +85,6 @@ class LiraApp:
              - name: lira.book.basic
                package: pythones-lirabook
         """
-        config = self._read_config()
         books_list = []
         for book_path in config.get("books", ["lira.books.intro"]):
             path = Path(book_path).expanduser()
@@ -85,3 +111,4 @@ class LiraApp:
     def setup(self):
         self._create_dirs()
         self._setup_logger()
+        self.load_config()

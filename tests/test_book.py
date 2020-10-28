@@ -13,17 +13,18 @@ class TestBook:
         self.book.parse()
         metadata = {
             "language": "en",
-            "title": "Basic Introducction to Python",
+            "title": "Basic Introduction to Python",
             "description": "Basic introduction to Python",
             "created": "16/10/2020",
             "updated": "16/10/2020",
             "authors": ["Santos Gallegos"],
             "contents": {
-                "Introducction": "intro.rst",
+                "Introduction": "intro.rst",
                 "Nested Content": "nested.rst",
             },
         }
         assert self.book.metadata == metadata
+        assert str(self.book) == "<Book: Basic Introduction to Python -> example/>"
 
     def test_book_chapters(self):
         self.book.parse()
@@ -33,7 +34,7 @@ class TestBook:
 
         chapter_one = chapters[0]
         assert isinstance(chapter_one, BookChapter)
-        assert chapter_one.title == "Introducction"
+        assert chapter_one.title == "Introduction"
         assert chapter_one.file.name == "intro.rst"
 
         chapter_two = chapters[1]

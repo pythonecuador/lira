@@ -42,5 +42,12 @@ def format(session):
 @nox.session
 def docs(session):
     session.install("-e", ".[docs]")
+    live_update = session.posargs and session.posargs[0] == "--live"
+    if live_update:
+        session.install("sphinx-autobuild")
+
     session.cd("docs")
-    session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")
+    if live_update:
+        session.run("sphinx-autobuild", ".", "_build/html")
+    else:
+        session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")

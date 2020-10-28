@@ -13,22 +13,23 @@ files = [
 def tests(session):
     session.install("coverage", "pytest")
     session.install("-e", ".")
-    session.run("coverage", "run", "-m", "pytest", "tests")
+    session.run("coverage", "run", "-m", "pytest", "tests", *session.posargs)
 
 
 @nox.session
 def coverage(session):
     session.install("coverage")
-    session.run("coverage", "report", "--fail-under", "76")
+    session.run("coverage", "report", "--fail-under", "84")
     session.run("coverage", "html")
 
 
 @nox.session
 def lint(session):
-    session.install("black", "flake8", "isort")
+    session.install("black", "flake8", "isort", "pydocstyle")
+    session.run("flake8", *files)
     session.run("black", "--check", *files)
     session.run("isort", "--check", *files)
-    session.run("flake8", *files)
+    session.run("pydocstyle", *files)
 
 
 @nox.session
@@ -41,5 +42,12 @@ def format(session):
 @nox.session
 def docs(session):
     session.install("-e", ".[docs]")
+    live_update = session.posargs and session.posargs[0] == "--live"
+    if live_update:
+        session.install("sphinx-autobuild")
+
     session.cd("docs")
-    session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")
+    if live_update:
+        session.run("sphinx-autobuild", ".", "_build/html")
+    else:
+        session.run("sphinx-build", "-b", "html", "-W", ".", "_build/html")

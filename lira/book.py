@@ -50,7 +50,7 @@ class BookChapter:
 
     def toc(self, depth=2):
         """
-        A list of tuples representing the table of contents.
+        Return a list of tuples representing the table of contents.
 
         The first element of the tuple is the title,
         and the second is list of sub-sections
@@ -151,3 +151,7 @@ class Book:
                     chapter.parse()
                 chapters.append(chapter)
         return chapters
+
+    def __repr__(self):
+        title = self.metadata.get("title", "")
+        return f"<Book: {title} -> {self.root.name}/>"

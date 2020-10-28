@@ -9,7 +9,6 @@ from docutils.utils import new_document
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
 
-# TODO: make a global logging config
 logger = logging.getLogger(__name__)
 
 
@@ -44,7 +43,7 @@ def is_importable(value):
 
 class BaseDirective(Directive):
     def run(self):
-        """Returns a `DirectiveNode`, so it can be interpreted by the parser."""
+        """Return a `DirectiveNode`, so it can be interpreted by the parser."""
         node = DirectiveNode(
             self.name,
             name=self.name,

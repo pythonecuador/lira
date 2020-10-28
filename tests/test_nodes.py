@@ -54,9 +54,9 @@ class TestNodes:
             description="I'm a validator",
         )
         assert node.tagname == "TestBlock"
-        assert node.options["validator"] == "lira.validators.Validator"
-        assert node.options["help"] == "Validate me"
-        assert node.options["description"] == "I'm a validator"
+        assert node.options.validator == "lira.validators.Validator"
+        assert node.options.help == "Validate me"
+        assert node.options.description == "I'm a validator"
         assert node.text() == "I'm a validator"
         assert str(node) == "<TestBlock lira.validators.Validator: I'm a validator>"
 
@@ -72,8 +72,8 @@ class TestNodes:
             type=type,
         )
         assert node.tagname == "Admonition"
-        assert node.options["title"] == "Hey!"
-        assert node.options["type"] == type
+        assert node.options.title == "Hey!"
+        assert node.options.type == type
         assert node.text() == "Hello world!"
         repr = (
             '<Admonition Hey!: [<Paragraph: [<Text: "Hello ">, <Strong: "world!">]>]>'
@@ -89,7 +89,7 @@ class TestNodes:
             title="I'm a section",
         )
         assert node.tagname == "Section"
-        assert node.options["title"] == "I'm a section"
+        assert node.options.title == "I'm a section"
         assert node.text() == "Hello world!\n\nHello again"
         repr = (
             "<Section I'm a section: "

@@ -32,7 +32,10 @@ def is_importable(value):
     try:
         MyClass = getattr(importlib.import_module(module_name), class_name, None)
         instance = MyClass()
-        return value
+        if instance is None:
+            raise ValueError
+        else:
+            return value
 
     except ImportError:
 

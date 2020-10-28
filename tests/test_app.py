@@ -24,6 +24,6 @@ class TestApp:
         book_path = data_dir / "../../lira/books/intro"
         assert book_a.root == book_path.resolve()
 
-        assert book_b.metadata["title"] == "Basic Introducction to Python"
+        assert book_b.metadata["title"] == "Basic Introduction to Python"
         book_path = data_dir / "books/example"
         assert book_b.root == book_path

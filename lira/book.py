@@ -151,3 +151,7 @@ class Book:
                     chapter.parse()
                 chapters.append(chapter)
         return chapters
+
+    def __repr__(self):
+        title = self.metadata.get("title", "")
+        return f"<Book: {title} -> {self.root.name}/>"

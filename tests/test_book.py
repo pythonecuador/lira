@@ -18,7 +18,7 @@ class TestBook:
             "created": "16/10/2020",
             "updated": "16/10/2020",
             "authors": ["Santos Gallegos"],
-            "contents": {
+            "chapters": {
                 "Introduction": "intro.rst",
                 "Nested Content": "nested.rst",
             },

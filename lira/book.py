@@ -102,7 +102,7 @@ class Book:
         "description",
         "created",
         "updated",
-        "contents",
+        "chapters",
     }
     meta_file = "book.yaml"
 
@@ -123,7 +123,7 @@ class Book:
         """
         self.metadata = self._parse_metadata()
         self.chapters = self._parse_chapters(
-            self.metadata["contents"], parse_chapter=all
+            self.metadata["chapters"], parse_chapter=all
         )
 
     def _parse_metadata(self):

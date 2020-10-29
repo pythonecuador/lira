@@ -61,6 +61,8 @@ and see if the linter, tests, and coverage are passing.
    make tests
    make coverage
 
+If you want help or have any questions, please join our telegram group `Python Ecuador <https://t.me/pythonecuador>`__.
+
 Roadmap
 -------
 

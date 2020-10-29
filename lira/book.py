@@ -139,17 +139,13 @@ class Book:
     def _parse_chapters(self, contents, parse_chapter=False):
         chapters = []
         for title, file in contents.items():
-            if isinstance(file, dict):
-                # TODO: support sub-chapters?
-                pass
-            else:
-                chapter = BookChapter(
-                    file=self.root / file,
-                    title=title,
-                )
-                if parse_chapter:
-                    chapter.parse()
-                chapters.append(chapter)
+            chapter = BookChapter(
+                file=self.root / file,
+                title=title,
+            )
+            if parse_chapter:
+                chapter.parse()
+            chapters.append(chapter)
         return chapters
 
     def __repr__(self):

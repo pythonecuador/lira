@@ -66,7 +66,7 @@ class BookChapter:
         table = []
         for node in nodes:
             if node.tagname == "Section":
-                title = node.options["title"]
+                title = node.options.title
                 table.append((title, self._toc(node.children, depth=depth - 1)))
         return table
 

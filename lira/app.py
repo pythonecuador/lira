@@ -45,7 +45,9 @@ class LiraApp:
     def _read_config(self, file):
         if not file.exists():
             log.info("Config file not found")
-            return {}
+            return {
+                "books": ["lira.books.intro"],
+            }
         with file.open() as f:
             config = yaml.safe_load(f)
         return config
@@ -86,7 +88,7 @@ class LiraApp:
                package: pythones-lirabook
         """
         books_list = []
-        for book_path in config.get("books", ["lira.books.intro"]):
+        for book_path in config.get("books", []):
             path = Path(book_path).expanduser()
             if not path.is_absolute():
                 path = (CONFIG_FILE.parent / path).resolve()

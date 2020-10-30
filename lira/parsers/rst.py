@@ -1,5 +1,5 @@
-import logging
 import importlib
+import logging
 
 from docutils.frontend import OptionParser
 from docutils.nodes import Element
@@ -23,15 +23,15 @@ class DirectiveNode(Element):
     - content
     - options
     """
+
     tagname = "directive"
 
 
 def is_importable(value):
-    module_name, class_name = value.rsplit(".",1)
+    module_name, class_name = value.rsplit(".", 1)
     try:
         MyClass = getattr(importlib.import_module(module_name), class_name, None)
-        instance = MyClass()
-        if instance is None:
+        if MyClass is None:
             raise ValueError
         else:
             return value

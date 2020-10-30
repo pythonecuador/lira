@@ -32,9 +32,9 @@ def is_importable(value):
     module_name, class_name = value.rsplit(".", 1)
     try:
         MyClass = getattr(importlib.import_module(module_name), class_name, None)
-        if MyClass is None:
+        if MyClass is None or not issubclass(MyClass, Validator):
             raise ValueError
-        elif issubclass(MyClass, Validator):
+        else:
             return value
 
     except ImportError:

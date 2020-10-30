@@ -8,6 +8,7 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
+from lira.validators import Validator
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,7 @@ def is_importable(value):
         MyClass = getattr(importlib.import_module(module_name), class_name, None)
         if MyClass is None:
             raise ValueError
-        else:
+        elif issubclass(MyClass, Validator):
             return value
 
     except ImportError:

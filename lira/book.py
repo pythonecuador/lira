@@ -66,7 +66,7 @@ class BookChapter:
         table = []
         for node in nodes:
             if node.tagname == "Section":
-                title = node.options["title"]
+                title = node.options.title
                 table.append((title, self._toc(node.children, depth=depth - 1)))
         return table
 
@@ -102,7 +102,7 @@ class Book:
         "description",
         "created",
         "updated",
-        "contents",
+        "chapters",
     }
     meta_file = "book.yaml"
 
@@ -123,7 +123,7 @@ class Book:
         """
         self.metadata = self._parse_metadata()
         self.chapters = self._parse_chapters(
-            self.metadata["contents"], parse_chapter=all
+            self.metadata["chapters"], parse_chapter=all
         )
 
     def _parse_metadata(self):
@@ -139,17 +139,13 @@ class Book:
     def _parse_chapters(self, contents, parse_chapter=False):
         chapters = []
         for title, file in contents.items():
-            if isinstance(file, dict):
-                # TODO: support sub-chapters?
-                pass
-            else:
-                chapter = BookChapter(
-                    file=self.root / file,
-                    title=title,
-                )
-                if parse_chapter:
-                    chapter.parse()
-                chapters.append(chapter)
+            chapter = BookChapter(
+                file=self.root / file,
+                title=title,
+            )
+            if parse_chapter:
+                chapter.parse()
+            chapters.append(chapter)
         return chapters
 
     def __repr__(self):

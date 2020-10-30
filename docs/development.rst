@@ -61,6 +61,21 @@ and see if the linter, tests, and coverage are passing.
    make tests
    make coverage
 
+If you want help or have any questions, please join our telegram group `Python Ecuador <https://t.me/pythonecuador>`__.
+
+Documentation
+-------------
+
+If you are contributing to the documentation,
+try ``make serve-docs`` to see it locally and with hot-reloading.
+
+Debugging
+---------
+
+If you are having problems,
+you can check the logs at ``~/.local/share/lira/log/lira.log``,
+or at ``~/AppData/Local/lira-data/log/lira.log`` if you are using Windows.
+
 Roadmap
 -------
 

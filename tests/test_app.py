@@ -14,11 +14,8 @@ class TestApp:
         app = LiraApp()
         app.setup()
 
-        default_config = {
-            "books": ["lira.books.intro"],
-        }
         assert not non_existing_config.exists()
-        assert default_config == app.config
+        assert app.config is app.default_config
 
     @mock.patch("lira.app.CONFIG_FILE", config_file)
     def test_load_books(self):

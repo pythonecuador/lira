@@ -22,6 +22,10 @@ class LiraApp:
     call to :py:method:`load_config`.
     """
 
+    default_config = {
+        "books": ["lira.books.intro"],
+    }
+
     def __init__(self):
         self.config = {}
         """Dictionary with the user configuration."""
@@ -45,9 +49,7 @@ class LiraApp:
     def _read_config(self, file):
         if not file.exists():
             log.info("Config file not found")
-            return {
-                "books": ["lira.books.intro"],
-            }
+            return self.default_config
         with file.open() as f:
             config = yaml.safe_load(f)
         return config

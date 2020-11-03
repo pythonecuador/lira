@@ -22,7 +22,7 @@ Create a virtual environment:
 
 .. code-block:: bash
 
-   python -m venv ven
+   python -m venv venv
    source venv/bin/activate
 
 Install the project locally with:

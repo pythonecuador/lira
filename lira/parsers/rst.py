@@ -31,8 +31,8 @@ class DirectiveNode(Element):
 def is_importable(value):
     module_name, class_name = value.rsplit(".", 1)
     try:
-        MyClass = getattr(importlib.import_module(module_name), class_name, None)
-        if MyClass is None or not issubclass(MyClass, Validator):
+        TargetClass = getattr(importlib.import_module(module_name), class_name, None)
+        if TargetClass is None or not issubclass(TargetClass, Validator):
             raise ValueError
         else:
             return value

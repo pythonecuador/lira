@@ -51,7 +51,7 @@ class TestBookChapter:
         self.chapter_two = self.book.chapters[1]
 
     def assert_toc(self, toc, expected_toc):
-        """Recursively check the `toc` has the same hierarchy as `expected`."""
+        """Recursively check that `toc` has the same hierarchy as `expected`."""
         if isinstance(expected_toc, list):
             assert isinstance(toc, list)
             assert len(toc) == len(expected_toc)

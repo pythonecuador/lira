@@ -28,6 +28,7 @@ or a local path to the directory of the book
 (it can be a relative path to the config file).
 
 .. code-block:: yaml
+
    books:
       # A dotted path to a module
       - lira.books.intro

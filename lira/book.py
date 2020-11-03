@@ -52,8 +52,8 @@ class BookChapter:
         """
         Return a list of tuples representing the table of contents.
 
-        The first element of the tuple is the title,
-        and the second is list of sub-sections
+        The first element of the tuple is a :py:class:`lira.parsers.nodes.Section`
+        instance, and the second is a list of sub-sections
         (it can be empty if it doesn't have subsections).
 
         :param depth: Depth of the table of contents.
@@ -66,8 +66,7 @@ class BookChapter:
         table = []
         for node in nodes:
             if node.tagname == "Section":
-                title = node.options.title
-                table.append((title, self._toc(node.children, depth=depth - 1)))
+                table.append((node, self._toc(node.children, depth=depth - 1)))
         return table
 
     def __repr__(self):

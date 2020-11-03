@@ -50,6 +50,19 @@ class TestBookChapter:
         self.chapter_one = self.book.chapters[0]
         self.chapter_two = self.book.chapters[1]
 
+    def assert_toc(self, toc, expected_toc):
+        """Recursively check that `toc` has the same hierarchy as `expected`."""
+        if isinstance(expected_toc, list):
+            assert isinstance(toc, list)
+            assert len(toc) == len(expected_toc)
+            for element, expected_element in zip(toc, expected_toc):
+                self.assert_toc(element, expected_element)
+        else:
+            section = toc[0]
+            content = toc[1]
+            assert section.options.title == expected_toc[0]
+            self.assert_toc(content, expected_toc[1])
+
     def test_chapter_metadata(self):
         metadata = {
             "tags": "comments",
@@ -67,7 +80,10 @@ class TestBookChapter:
         toc = [
             ("Comments", []),
         ]
-        assert self.chapter_one.toc() == toc
+        self.assert_toc(
+            self.chapter_one.toc(),
+            toc,
+        )
 
         toc = [
             (
@@ -78,11 +94,17 @@ class TestBookChapter:
                 ],
             )
         ]
-        assert self.chapter_two.toc() == toc
+        self.assert_toc(
+            self.chapter_two.toc(),
+            toc,
+        )
 
     def test_chapter_toc_custom_min_depth(self):
         toc = [("I'm a title", [])]
-        assert self.chapter_two.toc(depth=1) == toc
+        self.assert_toc(
+            self.chapter_two.toc(depth=1),
+            toc,
+        )
 
     def test_chapter_toc_custom_max_depth(self):
         toc = [
@@ -97,4 +119,7 @@ class TestBookChapter:
                 ],
             )
         ]
-        assert self.chapter_two.toc(depth=99) == toc
+        self.assert_toc(
+            self.chapter_two.toc(depth=99),
+            toc,
+        )

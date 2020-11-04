@@ -1,3 +1,6 @@
+from functools import namedtuple
+
+
 class Node:
 
     """
@@ -23,22 +26,15 @@ class Node:
         self.children = []
         """List of children of this node"""
 
-        self.options = {}
-        """Dictionary of options for this node"""
+        OptionsProxy = namedtuple("OptionsProxy", self.valid_options)
+        self.options = OptionsProxy(**options)
+        """Named tuple with the options for this node"""
 
         if self.is_terminal:
             if children:
                 self.content = children[0]
         else:
             self.children = list(children)
-
-        for option, value in options.items():
-            if option not in self.valid_options:
-                raise ValueError(
-                    f"Invalid option {option}. "
-                    f"Valid options are {self.valid_options}"
-                )
-            self.options[option] = value
 
     def _trim_text(self, text, max_len=30):
         split = text.split("\n")
@@ -68,14 +64,11 @@ class Node:
         """Name of the node."""
         return self.__class__.__name__
 
-    def __str__(self):
+    def __repr__(self):
         if self.is_terminal:
             text = self._trim_text(self.text())
             return f'<{self.tagname}: "{text}">'
         return f"<{self.tagname}: {self.children}>"
-
-    def __repr__(self):
-        return str(self)
 
 
 class NestedNode(Node):
@@ -149,8 +142,8 @@ class Section(NestedNode):
 
     valid_options = {"title"}
 
-    def __str__(self):
-        title = self.options["title"]
+    def __repr__(self):
+        title = self.options.title
         return f"<{self.tagname} {title}: {self.children}>"
 
 
@@ -171,8 +164,8 @@ class Admonition(NestedNode):
 
     valid_options = {"title", "type"}
 
-    def __str__(self):
-        title = self.options["title"]
+    def __repr__(self):
+        title = self.options.title
         return f"<{self.tagname} {title}: {self.children}>"
 
 
@@ -194,8 +187,8 @@ class CodeBlock(Node):
     def text(self):
         return "\n".join(self.content)
 
-    def __str__(self):
-        lang = self.options["language"]
+    def __repr__(self):
+        lang = self.options.language
         code = self._trim_text(self.text())
         return f"<{self.tagname} {lang}: {code}>"
 
@@ -216,11 +209,11 @@ class TestBlock(Node):
     valid_options = {"validator", "help", "description"}
 
     def text(self):
-        return self.options["description"]
+        return self.options.description
 
-    def __str__(self):
-        description = self.options["description"]
-        validator = self.options["validator"]
+    def __repr__(self):
+        description = self.options.description
+        validator = self.options.validator
         return f"<{self.tagname} {validator}: {description}>"
 
 

@@ -140,11 +140,11 @@ class SidebarMenu:
         )
 
     def get_top_items(self):
-        """Return the list of items on top of the current menu item"""
+        """Return the list of items on top of the current menu item."""
         return ["PyTutorial", "Clean Code", "TDD", "top"]
 
     def get_nested_items(self):
-        """Return the list of items nested on the current menu item"""
+        """Return the list of items nested on the current menu item."""
         nested_items = []
 
         self.lira.books[0].parse()
@@ -162,7 +162,7 @@ class SidebarMenu:
         self.tutorial.render(section)
 
     def get_buttons(self):
-        """Return a list of buttons from  a list of items"""
+        """Return a list of buttons from  a list of items."""
         buttons = []
 
         for i, item in enumerate(self.items):

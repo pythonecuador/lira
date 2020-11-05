@@ -1,13 +1,14 @@
-from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import Label, TextArea, Box, Button, Frame
-from prompt_toolkit.application import Application
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
-from prompt_toolkit.layout.layout import Layout
-from prompt_toolkit.layout.containers import HSplit, VSplit, Window, to_container
-from prompt_toolkit.application.current import get_app
-from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from functools import partial
+
+from prompt_toolkit.application import Application
+from prompt_toolkit.application.current import get_app
+from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
+from prompt_toolkit.layout.containers import HSplit, VSplit, Window, to_container
+from prompt_toolkit.layout.layout import Layout
+from prompt_toolkit.styles import Style
+from prompt_toolkit.widgets import Box, Button, Frame, Label, TextArea
 
 from lira.app import LiraApp
 from lira.book import Book
@@ -66,9 +67,7 @@ style = Style(
 
 
 sections = {
-    "menu": TextArea(
-        height=40, width=20, style=styles["Text"], text=""
-    ),
+    "menu": TextArea(height=40, width=20, style=styles["Text"], text=""),
     "status": TextArea(
         height=3,
         prompt=">>> ",
@@ -87,9 +86,10 @@ class ContentArea:
     def __init__(self):
         self.text_area = TextArea(focusable=True)
         self.text_area.text = "Refresh"
-        self.welcome = Label('Welcome to Lira! :)')
-        self.container = Box(height=20, width=80,  body=self.welcome, padding=1, style="class:right-pane")
-
+        self.welcome = Label("Welcome to Lira! :)")
+        self.container = Box(
+            height=20, width=80, body=self.welcome, padding=1, style="class:right-pane"
+        )
 
     def get_label(self, contents):
         formated_content = []
@@ -97,13 +97,12 @@ class ContentArea:
             text = node.text()
             style = node.tagname
             formated_content.append(to_formatted_text(text, styles[style]))
-            if node.tagname == 'Paragraph':
+            if node.tagname == "Paragraph":
                 formated_content.append(to_formatted_text("\n", ""))
 
         label = Label(merge_formatted_text(formated_content))
 
-        return label 
-
+        return label
 
     def get_sections_list(self):
         sections_list = []
@@ -111,7 +110,6 @@ class ContentArea:
             sections_list.append(sections[section])
 
         return sections_list
-
 
     def render(self, section):
         app = get_app()
@@ -121,26 +119,30 @@ class ContentArea:
         label = self.get_label(section)
 
         content.children = [
-            to_container(Box(height=20, width=80, body=label, padding=1, style="class:right-pane"))
+            to_container(
+                Box(
+                    height=20, width=80, body=label, padding=1, style="class:right-pane"
+                )
+            )
         ]
 
 
 class SidebarMenu:
     def __init__(self, lira):
-        self.lira =  lira
+        self.lira = lira
 
         self.tutorial = ContentArea()
 
         self.items = self.get_nested_items()
         self.buttons = self.get_buttons()
 
-        self.container = HSplit(self.buttons, padding=1, height=40, width=25, style=styles["Text"])
-
+        self.container = HSplit(
+            self.buttons, padding=1, height=40, width=25, style=styles["Text"]
+        )
 
     def get_top_items(self):
         """Return the list of items on top of the current menu item"""
-        return ['PyTutorial', 'Clean Code', 'TDD', 'top']
-
+        return ["PyTutorial", "Clean Code", "TDD", "top"]
 
     def get_nested_items(self):
         """Return the list of items nested on the current menu item"""
@@ -157,10 +159,8 @@ class SidebarMenu:
 
         return nested_items
 
-
     def select_section(self, section):
         self.tutorial.render(section)
-
 
     def get_buttons(self):
         """Return a list of buttons from  a list of items"""
@@ -168,11 +168,12 @@ class SidebarMenu:
 
         for i, item in enumerate(self.items):
             section = self.toc[i][0]
-            buttons.append(Button(f"{i + 1}.{item}", handler=partial(self.select_section, section)))
+            buttons.append(
+                Button(f"{i + 1}.{item}", handler=partial(self.select_section, section))
+            )
 
         buttons.append(Button("Exit", handler=self.exit))
         return buttons
-
 
     def exit(self):
         get_app().exit()
@@ -180,10 +181,10 @@ class SidebarMenu:
 
 class StatusBar:
     def __init__(self):
-        self.container = sections['status']
+        self.container = sections["status"]
 
 
-class TerminalUI():
+class TerminalUI:
     def __init__(self):
         self.theme = "default"
 
@@ -206,7 +207,6 @@ class TerminalUI():
             ]
         )
 
-
     def run(self):
         self.app = Application(
             layout=Layout(self.container),
@@ -215,4 +215,4 @@ class TerminalUI():
             full_screen=True,
         )
 
-        self.app.run() 
+        self.app.run()

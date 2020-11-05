@@ -98,6 +98,7 @@ class ContentArea:
 
     def render(self, section):
         app = get_app()
+        # TODO: access through the instance
         vsplit = app.layout.container.get_children()[0]
         content = vsplit.get_children()[2]
 

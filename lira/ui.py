@@ -76,6 +76,7 @@ class ContentArea:
         )
 
     def get_label(self, contents):
+        # TODO: parse and render individual nodes
         formated_content = []
         for node in contents.children:
             text = node.text()

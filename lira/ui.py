@@ -7,7 +7,6 @@ from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.layout.containers import HSplit, VSplit, Window, to_container
 from prompt_toolkit.layout.layout import Layout
-from prompt_toolkit.styles import Style
 from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira.app import LiraApp
@@ -53,18 +52,6 @@ themes = {
 styles = themes["default"]
 
 
-style = Style(
-    [
-        ("left-pane", "bg:#888800 #000000"),
-        ("right-pane", "bg:#00aa00 #000000"),
-        ("button", "#000000"),
-        ("button-arrow", "#000000"),
-        ("button focused", "bg:#ff0000"),
-        ("text-area focused", "bg:#ff0000"),
-    ]
-)
-
-
 sections = {
     "menu": TextArea(height=40, width=20, style=styles["Text"], text=""),
     "status": TextArea(
@@ -83,11 +70,9 @@ sections = {
 
 class ContentArea:
     def __init__(self):
-        self.text_area = TextArea(focusable=True)
-        self.text_area.text = "Refresh"
         self.welcome = Label("Welcome to Lira! :)")
         self.container = Box(
-            height=20, width=80, body=self.welcome, padding=1, style="class:right-pane"
+            height=20, width=80, body=self.welcome, padding=1, style=styles["Text"]
         )
 
     def get_label(self, contents):
@@ -119,18 +104,19 @@ class ContentArea:
 
         content.children = [
             to_container(
-                Box(
-                    height=20, width=80, body=label, padding=1, style="class:right-pane"
-                )
+                Box(height=20, width=80, body=label, padding=1, style=styles["Text"])
             )
         ]
 
 
 class SidebarMenu:
-    def __init__(self, lira):
+    def __init__(self, lira, content):
         self.lira = lira
+        self.content = content
 
-        self.tutorial = ContentArea()
+        self.lira.books[0].parse()
+        self.chapter = self.lira.books[0].chapters[0]
+        self.chapter.parse()
 
         self.items = self.get_nested_items()
         self.buttons = self.get_buttons()
@@ -141,34 +127,33 @@ class SidebarMenu:
 
     def get_top_items(self):
         """Return the list of items on top of the current menu item."""
-        return ["PyTutorial", "Clean Code", "TDD", "top"]
+        # TODO: return top items
+        return []
 
     def get_nested_items(self):
         """Return the list of items nested on the current menu item."""
+        # TODO: read from current menu position
         nested_items = []
 
-        self.lira.books[0].parse()
-        chapter = self.lira.books[0].chapters[0]
-        chapter.parse()
-        self.contents = chapter.contents[1]
-        self.toc = chapter.toc()
-
-        for i in self.toc:
-            nested_items.append(i[0].options.title)
+        for section, _ in self.chapter.toc(depth=1):
+            nested_items.append(section.options.title)
 
         return nested_items
 
     def select_section(self, section):
-        self.tutorial.render(section)
+        self.content.render(section)
 
     def get_buttons(self):
         """Return a list of buttons from  a list of items."""
         buttons = []
 
+        # TODO: iterate over sections
         for i, item in enumerate(self.items):
-            section = self.toc[i][0]
+            section = self.chapter.toc(depth=1)[i][0]
             buttons.append(
-                Button(f"{i + 1}.{item}", handler=partial(self.select_section, section))
+                Button(
+                    f"{i + 1}. {item}", handler=partial(self.select_section, section)
+                )
             )
 
         buttons.append(Button("Exit", handler=self.exit))
@@ -179,18 +164,19 @@ class SidebarMenu:
 
 
 class StatusBar:
-    def __init__(self):
+    def __init__(self, lira):
+        self.lira = lira
         self.container = sections["status"]
 
 
 class TerminalUI:
     def __init__(self):
-        self.theme = "default"
-
         self.lira = LiraApp()
         self.lira.setup()
-        self.menu = SidebarMenu(self.lira)
-        self.status = StatusBar()
+
+        self.content = ContentArea()
+        self.status = StatusBar(self.lira)
+        self.menu = SidebarMenu(self.lira, self.content)
 
         self.container = HSplit(
             [
@@ -198,7 +184,7 @@ class TerminalUI:
                     [
                         self.menu.container,
                         sections["vseparator"],
-                        self.menu.tutorial.container,
+                        self.content.container,
                     ]
                 ),
                 sections["hseparator"],

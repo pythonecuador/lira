@@ -8,10 +8,9 @@ from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.layout.containers import HSplit, VSplit, Window, to_container
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.styles import Style
-from prompt_toolkit.widgets import Box, Button, Frame, Label, TextArea
+from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira.app import LiraApp
-from lira.book import Book
 
 
 def get_key_bindings():

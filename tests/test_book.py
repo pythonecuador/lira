@@ -123,3 +123,7 @@ class TestBookChapter:
             self.chapter_two.toc(depth=99),
             toc,
         )
+
+    def test_chapter_repr(self):
+        assert str(self.chapter_one) == "<BookChapter: Introduction>"
+        assert str(self.chapter_two) == "<BookChapter: Nested Content>"

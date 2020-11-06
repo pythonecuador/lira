@@ -46,12 +46,14 @@ class ContentArea:
     def __init__(self, tui):
         self.tui = tui
         self.welcome = Label("Welcome to Lira! :)")
-        self.container = Box(
-            height=Dimension(min=5),
-            width=Dimension(min=5, weight=4),
-            body=self.welcome,
-            padding=1,
-            style=styles["Text"],
+        self.container = to_container(
+            Box(
+                height=Dimension(min=5),
+                width=Dimension(min=5, weight=4),
+                body=self.welcome,
+                padding=1,
+                style=styles["Text"],
+            )
         )
 
     def get_label(self, contents):
@@ -76,13 +78,8 @@ class ContentArea:
         return sections_list
 
     def render(self, section):
-        app = get_app()
-        # TODO: access through the instance
-        vsplit = app.layout.container.get_children()[0]
-        content = vsplit.get_children()[1]
-
         label = self.get_label(section)
-
+        content = self.tui.content.container
         content.children = [
             to_container(
                 Box(height=20, width=80, body=label, padding=1, style=styles["Text"])
@@ -149,15 +146,17 @@ class StatusBar:
     def __init__(self, tui):
         self.tui = tui
         self.lira = self.tui.lira
-        self.container = TextArea(
-            text="Ready!",
-            height=Dimension.exact(1),
-            prompt=">>> ",
-            style=styles["Text"],
-            multiline=False,
-            wrap_lines=False,
-            focusable=False,
-            read_only=True,
+        self.container = to_container(
+            TextArea(
+                text="Ready!",
+                height=Dimension.exact(1),
+                prompt=">>> ",
+                style=styles["Text"],
+                multiline=False,
+                wrap_lines=False,
+                focusable=False,
+                read_only=True,
+            )
         )
 
 

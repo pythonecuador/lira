@@ -5,8 +5,8 @@ from prompt_toolkit.application.current import get_app
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
-from prompt_toolkit.layout.containers import HSplit, VSplit, Window, to_container
-from prompt_toolkit.layout.layout import Layout
+from prompt_toolkit.layout import Dimension, Layout
+from prompt_toolkit.layout.containers import HSplit, VSplit, to_container
 from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira.app import LiraApp
@@ -54,17 +54,8 @@ styles = themes["default"]
 
 sections = {
     "menu": TextArea(height=40, width=20, style=styles["Text"], text=""),
-    "status": TextArea(
-        height=3,
-        prompt=">>> ",
-        style=styles["Text"],
-        multiline=False,
-        wrap_lines=False,
-    ),
     "text": TextArea(height=10, width=40, style=styles["Text"], text="text"),
     "prompt": TextArea(height=10, width=40, style=styles["Prompt"], text=""),
-    "vseparator": Window(height=0, width=1, char="│", style=styles["Separator"]),
-    "hseparator": Window(height=1, char="─", style=styles["Separator"]),
 }
 
 
@@ -72,7 +63,11 @@ class ContentArea:
     def __init__(self):
         self.welcome = Label("Welcome to Lira! :)")
         self.container = Box(
-            height=20, width=80, body=self.welcome, padding=1, style=styles["Text"]
+            height=Dimension(min=5),
+            width=Dimension(min=5, weight=4),
+            body=self.welcome,
+            padding=1,
+            style=styles["Text"],
         )
 
     def get_label(self, contents):
@@ -100,7 +95,7 @@ class ContentArea:
         app = get_app()
         # TODO: access through the instance
         vsplit = app.layout.container.get_children()[0]
-        content = vsplit.get_children()[2]
+        content = vsplit.get_children()[1]
 
         label = self.get_label(section)
 
@@ -124,7 +119,11 @@ class SidebarMenu:
         self.buttons = self.get_buttons()
 
         self.container = HSplit(
-            self.buttons, padding=1, height=40, width=25, style=styles["Text"]
+            self.buttons,
+            padding=1,
+            height=Dimension(min=5),
+            width=Dimension(min=5, weight=1),
+            style=styles["Text"],
         )
 
     def get_top_items(self):
@@ -168,7 +167,16 @@ class SidebarMenu:
 class StatusBar:
     def __init__(self, lira):
         self.lira = lira
-        self.container = sections["status"]
+        self.container = TextArea(
+            text="Ready!",
+            height=Dimension.exact(1),
+            prompt=">>> ",
+            style=styles["Text"],
+            multiline=False,
+            wrap_lines=False,
+            focusable=False,
+            read_only=True,
+        )
 
 
 class TerminalUI:
@@ -185,13 +193,17 @@ class TerminalUI:
                 VSplit(
                     [
                         self.menu.container,
-                        sections["vseparator"],
                         self.content.container,
-                    ]
+                    ],
+                    padding=Dimension.exact(1),
+                    padding_char="│",
+                    padding_style=styles["Separator"],
                 ),
-                sections["hseparator"],
                 self.status.container,
-            ]
+            ],
+            padding=Dimension.exact(1),
+            padding_char="─",
+            padding_style=styles["Separator"],
         )
 
     def run(self):

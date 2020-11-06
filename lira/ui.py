@@ -12,26 +12,9 @@ from prompt_toolkit.widgets import Box, Button, Label, TextArea
 from lira.app import LiraApp
 
 
-def get_key_bindings():
-    keys = KeyBindings()
-
-    @keys.add("tab")
-    @keys.add("down")
-    def _(event):
-        focus_next(event)
-
-    @keys.add("s-tab")
-    @keys.add("up")
-    def _(event):
-        focus_previous(event)
-
-    @keys.add("c-c")
-    @keys.add("c-q")
-    def _(event):
-        """Pressing Ctrl-Q or Ctrl-C will exit the user interface."""
-        event.app.exit()
-
-    return keys
+def exit_app():
+    """Exit the app and save any state."""
+    get_app().exit()
 
 
 themes = {
@@ -157,11 +140,8 @@ class SidebarMenu:
                 )
             )
 
-        buttons.append(Button("Exit", handler=self.exit))
+        buttons.append(Button("Exit", handler=exit_app))
         return buttons
-
-    def exit(self):
-        get_app().exit()
 
 
 class StatusBar:
@@ -209,9 +189,30 @@ class TerminalUI:
     def run(self):
         self.app = Application(
             layout=Layout(self.container),
-            key_bindings=get_key_bindings(),
+            key_bindings=self.get_key_bindings(),
             mouse_support=True,
             full_screen=True,
         )
 
         self.app.run()
+
+    def get_key_bindings(self):
+        keys = KeyBindings()
+
+        @keys.add("tab")
+        @keys.add("down")
+        def _(event):
+            focus_next(event)
+
+        @keys.add("s-tab")
+        @keys.add("up")
+        def _(event):
+            focus_previous(event)
+
+        @keys.add("c-c")
+        @keys.add("c-q")
+        def _(event):
+            """Pressing Ctrl-Q or Ctrl-C will exit the user interface."""
+            exit_app()
+
+        return keys

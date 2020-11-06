@@ -43,7 +43,8 @@ sections = {
 
 
 class ContentArea:
-    def __init__(self):
+    def __init__(self, tui):
+        self.tui = tui
         self.welcome = Label("Welcome to Lira! :)")
         self.container = Box(
             height=Dimension(min=5),
@@ -90,9 +91,9 @@ class ContentArea:
 
 
 class SidebarMenu:
-    def __init__(self, lira, content):
-        self.lira = lira
-        self.content = content
+    def __init__(self, tui):
+        self.tui = tui
+        self.lira = self.tui.lira
 
         self.lira.books[0].parse()
         self.chapter = self.lira.books[0].chapters[0]
@@ -125,7 +126,7 @@ class SidebarMenu:
         return nested_items
 
     def select_section(self, section):
-        self.content.render(section)
+        self.tui.content.render(section)
 
     def get_buttons(self):
         """Return a list of buttons from  a list of items."""
@@ -145,8 +146,9 @@ class SidebarMenu:
 
 
 class StatusBar:
-    def __init__(self, lira):
-        self.lira = lira
+    def __init__(self, tui):
+        self.tui = tui
+        self.lira = self.tui.lira
         self.container = TextArea(
             text="Ready!",
             height=Dimension.exact(1),
@@ -164,9 +166,9 @@ class TerminalUI:
         self.lira = LiraApp()
         self.lira.setup()
 
-        self.content = ContentArea()
-        self.status = StatusBar(self.lira)
-        self.menu = SidebarMenu(self.lira, self.content)
+        self.content = ContentArea(self)
+        self.status = StatusBar(self)
+        self.menu = SidebarMenu(self)
 
         self.container = HSplit(
             [

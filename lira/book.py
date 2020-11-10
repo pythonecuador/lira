@@ -30,9 +30,10 @@ class BookChapter:
     :param title: Title of the chapter (defaults to the name of the file)
     """
 
-    def __init__(self, *, file: Path, title: str = None):
+    def __init__(self, *, book, file: Path, title: str = None):
         self.file = file
         self.title = title or file.name
+        self.book = book
 
         self.metadata = {}
         """Dictionary with the metadata from the book"""
@@ -139,6 +140,7 @@ class Book:
         chapters = []
         for title, file in contents.items():
             chapter = BookChapter(
+                book=self,
                 file=self.root / file,
                 title=title,
             )

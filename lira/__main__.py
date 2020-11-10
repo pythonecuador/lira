@@ -1,4 +1,4 @@
-from lira.ui import TerminalUI
+from lira.tui import TerminalUI
 
 
 def main():

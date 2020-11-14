@@ -56,7 +56,7 @@ class TerminalUI:
 
         @keys.add(Keys.Backspace)
         def _(event):
-            self.menu.back()
+            self.menu.pop()
 
         @keys.add("c-c")
         @keys.add("c-q")

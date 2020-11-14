@@ -14,6 +14,7 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+from lira import __version__
 
 # -- Project information -----------------------------------------------------
 
@@ -22,7 +23,7 @@ copyright = "2020, Python Ecuador"
 author = "Santos Gallegos, Sebastian Moscoso"
 
 # The full version, including alpha/beta/rc tags
-release = "0.0.1rc1"
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------

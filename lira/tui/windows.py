@@ -2,7 +2,7 @@ from textwrap import dedent
 
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.layout import Dimension
-from prompt_toolkit.layout.containers import HSplit, to_container
+from prompt_toolkit.layout.containers import DynamicContainer, HSplit, to_container
 from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira import __version__
@@ -12,13 +12,13 @@ from lira.tui.utils import exit_app
 
 class WindowContainer:
 
-    pages_container = "container"
+    inner_container = "container"
 
     def __init__(self, tui):
         self.tui = tui
         self.lira = self.tui.lira
         self.pages = []
-        self.container = self._get_default_container()
+        self.container = DynamicContainer(self._get_default_container)
 
     def _get_default_container(self):
         return to_container(Label("Empty container"))
@@ -32,16 +32,19 @@ class WindowContainer:
         if window:
             layout.focus(window)
 
+    def get_inner_container(self):
+        return getattr(self, self.inner_container)
+
     def render(self, widget):
-        container = getattr(self, self.pages_container)
-        container.children = to_container(widget).get_children()
+        container = self.get_inner_container()
+        container.get_container = lambda: to_container(widget)
         self.focus()
 
     def push(self, widget):
         self.pages.append(widget)
         self.render(widget)
 
-    def back(self):
+    def pop(self):
         if len(self.pages) <= 1:
             return
         self.pages.pop()
@@ -49,11 +52,9 @@ class WindowContainer:
         self.render(prev_window)
 
     def reset(self, widget=None):
-        if widget:
-            self.pages = [widget]
-        else:
-            self.pages = []
-        self.render()
+        widget = widget or self._get_default_container()
+        self.pages = [widget]
+        self.render(widget)
 
     def __pt_container__(self):
         return self.container
@@ -79,8 +80,8 @@ class ContentArea(WindowContainer):
         )
         return to_container(
             Box(
-                height=Dimension(min=5),
-                width=Dimension(min=5, weight=4),
+                height=Dimension(min=1),
+                width=Dimension(min=1, weight=4),
                 body=text_area,
                 padding=1,
                 style=theme["text"],
@@ -103,33 +104,27 @@ class ContentArea(WindowContainer):
         return label
 
     def render_section(self, section):
-        content = self.tui.content.container
-        content.children = [
-            to_container(
-                Box(
-                    height=20,
-                    width=80,
-                    body=self._get_content(section),
-                    padding=1,
-                    style=theme["text"],
-                )
+        content = self.tui.content
+        content.reset(
+            Box(
+                height=Dimension(min=1),
+                width=Dimension(min=1, weight=4),
+                body=self._get_content(section),
+                padding=1,
+                style=theme["text"],
             )
-        ]
+        )
 
 
 class SidebarMenu(WindowContainer):
 
-    pages_container = "list"
+    inner_container = "list"
 
     def __init__(self, tui):
         super().__init__(tui)
-        self.list = HSplit(
-            [],
-            height=Dimension(min=1),
-            width=Dimension(min=1),
-        )
+        self.list = DynamicContainer(self._get_default_container)
         self.back_button = to_container(
-            Button("Back", handler=self.back),
+            Button("Back", handler=self.pop),
         )
         self.container = HSplit(
             [
@@ -140,6 +135,7 @@ class SidebarMenu(WindowContainer):
             height=Dimension(min=1),
             width=Dimension(min=1),
         )
+        self.toggle_back_button()
 
     def toggle_back_button(self):
         dimension = 1 if len(self.pages) > 1 else 0
@@ -149,8 +145,8 @@ class SidebarMenu(WindowContainer):
         super().push(widget)
         self.toggle_back_button()
 
-    def back(self):
-        super().back()
+    def pop(self):
+        super().pop()
         self.toggle_back_button()
 
 

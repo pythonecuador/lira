@@ -13,7 +13,11 @@ class List:
         self.parent = parent
         self.index = index
         self.elements = self._get_elements()
-        self.container = HSplit(children=self.elements)
+        self.container = HSplit(
+            children=self.elements,
+            height=Dimension(min=1),
+            width=Dimension(min=1),
+        )
 
     def get_title(self, text):
         return Box(

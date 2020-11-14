@@ -19,7 +19,7 @@ def tests(session):
 @nox.session
 def coverage(session):
     session.install("coverage")
-    session.run("coverage", "report", "--fail-under", "84")
+    session.run("coverage", "report", "--fail-under", "83")
     session.run("coverage", "html")
 
 

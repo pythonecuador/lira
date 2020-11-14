@@ -89,31 +89,56 @@ class ContentArea(WindowContainer):
         )
 
     def _get_content(self, node):
-        # TODO: parse and render individual nodes
-        formated_content = []
+        split_elements = []
+        block = []
+
         for child in node.children:
-            text = child.text()
-            formated_content.append(
-                to_formatted_text(text, theme["nodes"][child.tagname])
-            )
-            if child.tagname == "Paragraph":
-                formated_content.append(to_formatted_text("\n", ""))
+            block.append(to_formatted_text(node.options.title, ""))
+            tag = child.tagname
 
-        label = Label(merge_formatted_text(formated_content))
+            if tag == "Paragraph":
+                split_elements.append(Label(merge_formatted_text(block)))
+                block = []
+                block.append(
+                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
+                )
 
-        return label
+            elif tag == "CodeBlock":
+                split_elements.append(Label(merge_formatted_text(block)))
+                block = []
+                block.append(
+                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
+                )
+
+            elif tag == "TestBlock":
+                split_elements.append(Label(merge_formatted_text(block)))
+                split_elements.append(
+                    TextArea(
+                        style=theme["text"],
+                        focusable=True,
+                        read_only=False,
+                    )
+                )
+
+            elif tag == "Text" and tag == "Strong" and tag == "Emphasis":
+                block.append(
+                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
+                )
+
+        split_elements.append(Label(merge_formatted_text(block)))
+
+        container = HSplit(
+            split_elements,
+            height=Dimension(min=1),
+            width=Dimension(min=1, weight=4),
+            padding=1,
+        )
+
+        return container
 
     def render_section(self, section):
         content = self.tui.content
-        content.reset(
-            Box(
-                height=Dimension(min=1),
-                width=Dimension(min=1, weight=4),
-                body=self._get_content(section),
-                padding=1,
-                style=theme["text"],
-            )
-        )
+        content.reset(self._get_content(section))
 
 
 class SidebarMenu(WindowContainer):

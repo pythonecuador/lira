@@ -22,7 +22,6 @@ class LiraApp:
     call to :py:method:`load_config`.
     """
 
-    version = "0.0.1rc1"
     default_config = {
         "books": ["lira.books.intro"],
     }

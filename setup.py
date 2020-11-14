@@ -1,11 +1,13 @@
 import setuptools
 
+from lira import __version__
+
 with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
     name="lira",
-    version="0.0.1rc1",
+    version=__version__,
     author="Python Ecuador",
     author_email="ecuadorpython@gmail.com",
     description="Tutorial interactivo de Python en tu terminal",

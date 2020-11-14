@@ -5,6 +5,7 @@ from prompt_toolkit.layout import Dimension
 from prompt_toolkit.layout.containers import HSplit, to_container
 from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
+from lira import __version__
 from lira.tui.themes import theme
 from lira.tui.utils import exit_app
 
@@ -67,7 +68,7 @@ class ContentArea(WindowContainer):
             - Press <C-c> or <C-q> to exit.
             - Navivate with <Tab> and the navigation keys.
 
-            Version: {self.lira.version}
+            Version: {__version__}
             """
         )
         text_area = TextArea(

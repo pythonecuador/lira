@@ -66,6 +66,12 @@ class TerminalUI:
 
         return keys
 
+    def _ready(self, app):
+        key = "__is_ready"
+        if not hasattr(self, key):
+            self.status.notify("Ready!")
+            setattr(self, key, True)
+
     def run(self):
         self.app = Application(
             layout=Layout(self.container),
@@ -73,6 +79,6 @@ class TerminalUI:
             mouse_support=True,
             full_screen=True,
             style=style,
+            after_render=self._ready,
         )
-
         self.app.run()

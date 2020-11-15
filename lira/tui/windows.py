@@ -1,5 +1,7 @@
+import asyncio
 from textwrap import dedent
 
+from prompt_toolkit.application.current import get_app
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.layout import Dimension
 from prompt_toolkit.layout.containers import DynamicContainer, HSplit, to_container
@@ -151,19 +153,36 @@ class SidebarMenu(WindowContainer):
 
 
 class StatusBar(WindowContainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.history = []
+
     def _get_default_container(self):
-        return to_container(
-            TextArea(
-                text="Ready!",
-                height=Dimension.exact(1),
-                prompt=">>> ",
-                style=theme["text"],
-                multiline=False,
-                wrap_lines=False,
-                focusable=False,
-                read_only=True,
-            )
+        return to_container(self._get_status_area())
+
+    def _get_status_area(self, status=""):
+        return TextArea(
+            text=status,
+            height=Dimension.exact(1),
+            prompt=">>> ",
+            style=theme["text"],
+            multiline=False,
+            wrap_lines=False,
+            focusable=False,
+            read_only=True,
         )
 
     def update_status(self, status=""):
-        self.container.children[0].text = status
+        self.history.append(status)
+        self.reset(self._get_status_area(status))
+        get_app().invalidate()
+
+    def notify(self, text, delay=1.5):
+        # TODO: create a queue, so notifications don't overlap.
+        async def _main():
+            await asyncio.sleep(0.1)
+            self.update_status(text)
+            await asyncio.sleep(delay)
+            self.update_status()
+
+        return asyncio.create_task(_main())

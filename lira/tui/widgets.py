@@ -5,6 +5,8 @@ from prompt_toolkit.layout import Dimension
 from prompt_toolkit.layout.containers import HSplit
 from prompt_toolkit.widgets import Box, Button, Label
 
+from lira.tui.utils import set_title
+
 
 class List:
     def __init__(self, tui, parent=None, index=0):
@@ -46,6 +48,7 @@ class BooksList(List):
 
     def select(self, book, index=0):
         widget = BookChaptersList(self.tui, book)
+        set_title(book.metadata["title"])
         self.tui.menu.push(widget)
 
 

@@ -11,7 +11,7 @@ files = [
 
 @nox.session
 def tests(session):
-    session.install("coverage", "pytest")
+    session.install("coverage", "pytest", "pytest-asyncio")
     session.install("-e", ".")
     session.run("coverage", "run", "-m", "pytest", "tests", *session.posargs)
 
@@ -19,7 +19,7 @@ def tests(session):
 @nox.session
 def coverage(session):
     session.install("coverage")
-    session.run("coverage", "report", "--fail-under", "84")
+    session.run("coverage", "report", "--fail-under", "85")
     session.run("coverage", "html")
 
 

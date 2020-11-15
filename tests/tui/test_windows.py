@@ -1,9 +1,10 @@
 from unittest import mock
 
+import pytest
 from prompt_toolkit.layout.containers import to_container
 from prompt_toolkit.widgets import Button, Label
 
-from lira.tui.windows import SidebarMenu
+from lira.tui.windows import SidebarMenu, StatusBar
 
 from .utils import is_visible, to_widget
 
@@ -63,3 +64,34 @@ class TestSidebarMenu:
 
         label = children[0].get_container().content
         assert label.text() == "First"
+
+
+class TestStatusBar:
+    def _get_current_status(self, window):
+        return to_container(window).get_children()[0].content.buffer.text
+
+    def setup_method(self):
+        tui = mock.MagicMock()
+        self.window = StatusBar(tui=tui)
+
+    def test_update_status(self):
+        assert self._get_current_status(self.window) == ""
+
+        msg = "Hello world!"
+        self.window.update_status(msg)
+        assert self._get_current_status(self.window) == msg
+
+        assert len(self.window.history) == 1
+        assert self.window.history[0] == msg
+
+    @pytest.mark.asyncio
+    async def test_notify(self):
+        assert self._get_current_status(self.window) == ""
+
+        msg = "Hello world!"
+        await self.window.notify(msg, delay=0.1)
+
+        assert len(self.window.history) == 2
+        assert self.window.history[0] == msg
+        assert self.window.history[1] == ""
+        assert self._get_current_status(self.window) == ""

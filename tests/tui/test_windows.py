@@ -6,7 +6,7 @@ from prompt_toolkit.widgets import Button, Label
 
 from lira.tui.windows import SidebarMenu, StatusBar
 
-from .utils import is_visible, to_widget
+from .utils import to_widget
 
 
 class TestSidebarMenu:
@@ -19,18 +19,16 @@ class TestSidebarMenu:
         assert len(children) == 3
 
         empty_label = children[0].get_container().content
-        back_button = to_widget(children[1])
+        back_button = children[1]
         exit_button = to_widget(children[2])
 
         assert empty_label.text() == "Empty container"
 
-        assert isinstance(back_button, Button)
-        assert back_button.text == "Back"
-        assert not is_visible(back_button)
+        assert to_widget(back_button.content).text == "Back"
+        assert not back_button.filter()
 
         assert isinstance(exit_button, Button)
         assert exit_button.text == "Exit"
-        assert is_visible(exit_button)
 
     def test_toggle_back_button(self):
         first_label = Label("First")
@@ -40,15 +38,14 @@ class TestSidebarMenu:
         self.window.push(second_label)
 
         children = to_container(self.window).get_children()
-        back_button = to_widget(children[1])
+        back_button = children[1]
         exit_button = to_widget(children[2])
 
-        # Back button is visible
-        assert back_button.text == "Back"
-        assert is_visible(back_button)
-
         assert exit_button.text == "Exit"
-        assert is_visible(exit_button)
+
+        # Back button is visible
+        assert to_widget(back_button.content).text == "Back"
+        assert back_button.filter()
 
         label = children[0].get_container().content
         assert label.text() == "Second"
@@ -56,11 +53,8 @@ class TestSidebarMenu:
         self.window.pop()
 
         # Back button is't visible
-        assert back_button.text == "Back"
-        assert not is_visible(back_button)
-
-        assert exit_button.text == "Exit"
-        assert is_visible(exit_button)
+        assert to_widget(back_button.content).text == "Back"
+        assert not back_button.filter()
 
         label = children[0].get_container().content
         assert label.text() == "First"

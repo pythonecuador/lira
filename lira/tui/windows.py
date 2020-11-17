@@ -9,7 +9,7 @@ from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira import __version__
 from lira.tui.themes import theme
-from lira.tui.utils import exit_app
+from lira.tui.utils import exit_app, set_title
 
 
 class WindowContainer:
@@ -149,6 +149,8 @@ class SidebarMenu(WindowContainer):
 
     def pop(self):
         super().pop()
+        if len(self.pages) <= 1:
+            set_title()
         self.toggle_back_button()
 
 

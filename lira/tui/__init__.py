@@ -7,7 +7,7 @@ from prompt_toolkit.layout.containers import HSplit, VSplit
 
 from lira.app import LiraApp
 from lira.tui.themes import style, theme
-from lira.tui.utils import exit_app
+from lira.tui.utils import exit_app, set_title
 from lira.tui.widgets import BooksList
 from lira.tui.windows import ContentArea, SidebarMenu, StatusBar
 
@@ -40,6 +40,14 @@ class TerminalUI:
             padding_char="─",
             padding_style=theme["separator"],
         )
+        self.app = Application(
+            layout=Layout(self.container),
+            key_bindings=self.get_key_bindings(),
+            mouse_support=True,
+            full_screen=True,
+            style=style,
+            after_render=self._ready,
+        )
 
     def get_key_bindings(self):
         keys = KeyBindings()
@@ -69,16 +77,9 @@ class TerminalUI:
     def _ready(self, app):
         key = "__is_ready"
         if not hasattr(self, key):
+            set_title()
             self.status.notify("Ready!")
             setattr(self, key, True)
 
     def run(self):
-        self.app = Application(
-            layout=Layout(self.container),
-            key_bindings=self.get_key_bindings(),
-            mouse_support=True,
-            full_screen=True,
-            style=style,
-            after_render=self._ready,
-        )
         self.app.run()

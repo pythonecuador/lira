@@ -1,9 +1,42 @@
 from functools import partial
 
 from prompt_toolkit.formatted_text import HTML
-from prompt_toolkit.layout import Dimension
+from prompt_toolkit.layout import Dimension, Window, WindowAlign
 from prompt_toolkit.layout.containers import HSplit
+from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.widgets import Box, Button, Label
+
+from lira.tui.utils import set_title
+
+
+class FormattedTextArea:
+    def __init__(
+        self,
+        text="",
+        focusable=False,
+        wrap_lines=True,
+        width=None,
+        height=None,
+        align=WindowAlign.LEFT,
+        style="",
+    ):
+        self.text = text
+        self.formatted_text_control = FormattedTextControl(
+            text=lambda: self.text,
+            focusable=focusable,
+        )
+        self.window = Window(
+            content=self.formatted_text_control,
+            width=width,
+            height=height,
+            style="class:formatted-text-area " + style,
+            wrap_lines=wrap_lines,
+            dont_extend_height=True,
+            dont_extend_width=False,
+        )
+
+    def __pt_container__(self):
+        return self.window
 
 
 class List:
@@ -46,6 +79,7 @@ class BooksList(List):
 
     def select(self, book, index=0):
         widget = BookChaptersList(self.tui, book)
+        set_title(book.metadata["title"])
         self.tui.menu.push(widget)
 
 

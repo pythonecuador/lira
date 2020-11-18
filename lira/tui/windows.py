@@ -2,9 +2,15 @@ import asyncio
 from textwrap import dedent
 
 from prompt_toolkit.application.current import get_app
+from prompt_toolkit.filters import Condition
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.layout import Dimension
-from prompt_toolkit.layout.containers import DynamicContainer, HSplit, to_container
+from prompt_toolkit.layout.containers import (
+    ConditionalContainer,
+    DynamicContainer,
+    HSplit,
+    to_container,
+)
 from prompt_toolkit.widgets import Box, Button, Label, TextArea
 
 from lira import __version__
@@ -125,8 +131,9 @@ class SidebarMenu(WindowContainer):
     def __init__(self, tui):
         super().__init__(tui)
         self.list = DynamicContainer(self._get_default_container)
-        self.back_button = to_container(
+        self.back_button = ConditionalContainer(
             Button("Back", handler=self.pop),
+            filter=Condition(lambda: len(self.pages) > 1),
         )
         self.container = HSplit(
             [
@@ -137,21 +144,11 @@ class SidebarMenu(WindowContainer):
             height=Dimension(min=1),
             width=Dimension(min=1),
         )
-        self.toggle_back_button()
-
-    def toggle_back_button(self):
-        dimension = 1 if len(self.pages) > 1 else 0
-        self.back_button.height = Dimension.exact(dimension)
-
-    def push(self, widget):
-        super().push(widget)
-        self.toggle_back_button()
 
     def pop(self):
         super().pop()
         if len(self.pages) <= 1:
             set_title()
-        self.toggle_back_button()
 
 
 class StatusBar(WindowContainer):

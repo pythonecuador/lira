@@ -15,6 +15,7 @@ class TestSidebarMenu:
         self.window = SidebarMenu(tui=tui)
 
     def test_default_menu(self):
+        """The default menu has 2 buttons and a label."""
         children = to_container(self.window).get_children()
         assert len(children) == 3
 
@@ -24,13 +25,16 @@ class TestSidebarMenu:
 
         assert empty_label.text() == "Empty container"
 
+        # Back button is not visible
         assert to_widget(back_button.content).text == "Back"
         assert not back_button.filter()
 
+        # Exit button is visible
         assert isinstance(exit_button, Button)
         assert exit_button.text == "Exit"
 
     def test_toggle_back_button(self):
+        """The back button is only visible if there are at least 2 pages."""
         first_label = Label("First")
         second_label = Label("Second")
 
@@ -47,8 +51,8 @@ class TestSidebarMenu:
         assert to_widget(back_button.content).text == "Back"
         assert back_button.filter()
 
-        label = children[0].get_container().content
-        assert label.text() == "Second"
+        label = children[0].get_container()
+        assert label.text == "Second"
 
         self.window.pop()
 
@@ -56,8 +60,8 @@ class TestSidebarMenu:
         assert to_widget(back_button.content).text == "Back"
         assert not back_button.filter()
 
-        label = children[0].get_container().content
-        assert label.text() == "First"
+        label = children[0].get_container()
+        assert label.text == "First"
 
 
 class TestStatusBar:

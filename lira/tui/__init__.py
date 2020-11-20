@@ -21,7 +21,7 @@ class TerminalUI:
         self.status = StatusBar(self)
 
         self.menu = SidebarMenu(self)
-        self.menu.push(BooksList(self))
+        self.menu.reset(BooksList(self))
 
         self.container = HSplit(
             [
@@ -52,24 +52,17 @@ class TerminalUI:
     def get_key_bindings(self):
         keys = KeyBindings()
 
-        @keys.add("tab")
-        @keys.add("down")
+        @keys.add(Keys.Tab)
         def _(event):
             focus_next(event)
 
-        @keys.add("s-tab")
-        @keys.add("up")
+        @keys.add(Keys.BackTab)
         def _(event):
             focus_previous(event)
 
-        @keys.add(Keys.Backspace)
+        @keys.add(Keys.ControlC)
+        @keys.add(Keys.ControlQ)
         def _(event):
-            self.menu.pop()
-
-        @keys.add("c-c")
-        @keys.add("c-q")
-        def _(event):
-            """Pressing Ctrl-Q or Ctrl-C will exit the user interface."""
             exit_app()
 
         return keys

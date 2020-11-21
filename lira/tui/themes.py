@@ -6,7 +6,7 @@ themes = {
         "strong": "#fff bold",
         "literal": "#fff",
         "emphasis": "#fff italic",
-        "title": "#fff bold",
+        "title": "#55f bold",
         "separator": "#aaa",
     }
 }
@@ -19,10 +19,10 @@ theme["nodes"] = {
     "Strong": theme["strong"],
     "Emphasis": theme["emphasis"],
     "Literal": theme["literal"],
+    "Section": theme["title"],
     # TODO: delete these
     "Paragraph": "#fff",
     "CodeBlock": "#fff",
     "Prompt": "bg:#999999 #fff",
     "TestBlock": "#fff",
-    "Section": "#fff",
 }

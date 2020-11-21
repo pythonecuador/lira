@@ -1,0 +1,13 @@
+language: en
+title: Python Tutorial
+description: Introducction to Python
+created: 16/11/2020
+updated: 16/11/2020
+authors:
+  - Seburath
+
+chapters:
+  Introducction: intro.rst
+  An Informal Introduction to Python: showcase.rst
+  More Control Flow Tools: showcase.rst
+  Data Structures: showcase.rst

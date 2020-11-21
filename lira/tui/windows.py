@@ -95,61 +95,38 @@ class ContentArea(WindowContainer):
         )
 
     def _get_content(self, node):
-        def merge(block):
-            return FormattedTextArea(merge_formatted_text(block))
-
-        def add(node):
-            tag = node.tagname
-            if tag == "Section":
-                return to_formatted_text(node.options.title, theme["nodes"][tag])
-            else:
-                return to_formatted_text(node.text(), theme["nodes"][tag])
-
         content = []
-        block = []
 
-        if node.tagname == "Section":
-            block.append(add(node))
-            content.append(merge(block))
-            block = []
+        tag = node.tagname
+        if tag == "Section":
+            content.append(to_formatted_text(node.options.title, theme["nodes"][tag]))
 
         for child in node.children:
             tag = child.tagname
 
-            if tag == "Paragraph":
-                content.append(merge(block))
-                block = []
+            if tag == "Section":
+                content.extend(self._get_content(node))
 
+            elif tag == "Paragraph":
+                content.append(to_formatted_text("\n\n", ""))
                 content.extend(self._get_content(child))
 
             elif tag == "CodeBlock":
-                content.append(merge(block))
-                block = []
-
-                block.append(add(child))
+                content.append(to_formatted_text("\n\n" + child.text(), ""))
 
             elif tag == "TestBlock":
-                content.append(merge(block))
-                block = []
+                content.append(to_formatted_text("\n\n [TestBlock]", ""))
 
-                content.append(
-                    TextArea(
-                        style=theme["text"],
-                        focusable=True,
-                        read_only=False,
-                    )
-                )
+            elif tag in ["Text", "Strong", "Emphasis"]:
+                content.append(to_formatted_text(child.text(), theme["nodes"][tag]))
 
-            elif tag == "Text" or tag == "Strong" or tag == "Emphasis":
-                block.append(add(child))
-
-        content.append(merge(block))
         return content
 
     def render_section(self, section):
         content = self.tui.content
+        parsed_section = merge_formatted_text(self._get_content(section))
         container = HSplit(
-            self._get_content(section),
+            [FormattedTextArea(parsed_section)],
             height=Dimension(min=1),
             width=Dimension(min=1, weight=4),
             padding=0,

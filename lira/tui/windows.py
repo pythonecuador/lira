@@ -18,8 +18,6 @@ from lira.tui.themes import theme
 from lira.tui.utils import exit_app, set_title
 from lira.tui.widgets import FormattedTextArea
 
-from lira.tui.widgets import FormattedTextArea
-
 class WindowContainer:
 
     inner_container = "container"

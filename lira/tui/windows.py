@@ -17,6 +17,7 @@ from lira import __version__
 from lira.tui.themes import theme
 from lira.tui.utils import exit_app, set_title
 
+from lira.tui.widgets import FormattedTextArea
 
 class WindowContainer:
 
@@ -97,30 +98,45 @@ class ContentArea(WindowContainer):
         )
 
     def _get_content(self, node):
-        split_elements = []
+
+        def merge(block):
+            return FormattedTextArea(merge_formatted_text(block))
+
+        def add(node):
+            tag = node.tagname
+            if tag == "Section":
+                return to_formatted_text(node.options.title, theme["nodes"][tag])
+            else:
+                return to_formatted_text(node.text(), theme["nodes"][tag])
+
+        content = []
         block = []
 
+        if node.tagname == "Section":
+            block.append(add(node))
+            content.append(merge(block))
+            block = []
+        
         for child in node.children:
-            block.append(to_formatted_text(node.options.title, ""))
             tag = child.tagname
 
             if tag == "Paragraph":
-                split_elements.append(Label(merge_formatted_text(block)))
+                content.append(merge(block))
                 block = []
-                block.append(
-                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
-                )
+
+                content.extend(self._get_content(child))
 
             elif tag == "CodeBlock":
-                split_elements.append(Label(merge_formatted_text(block)))
+                content.append(merge(block))
                 block = []
-                block.append(
-                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
-                )
+
+                block.append(add(child))
 
             elif tag == "TestBlock":
-                split_elements.append(Label(merge_formatted_text(block)))
-                split_elements.append(
+                content.append(merge(block))
+                block = []
+
+                content.append(
                     TextArea(
                         style=theme["text"],
                         focusable=True,
@@ -128,25 +144,21 @@ class ContentArea(WindowContainer):
                     )
                 )
 
-            elif tag == "Text" and tag == "Strong" and tag == "Emphasis":
-                block.append(
-                    to_formatted_text(child.text(), theme["nodes"][child.tagname])
-                )
+            elif tag == "Text" or tag == "Strong" or tag == "Emphasis":
+                block.append(add(child))
 
-        split_elements.append(Label(merge_formatted_text(block)))
-
-        container = HSplit(
-            split_elements,
-            height=Dimension(min=1),
-            width=Dimension(min=1, weight=4),
-            padding=1,
-        )
-
-        return container
+        content.append(merge(block))
+        return content
 
     def render_section(self, section):
         content = self.tui.content
-        content.reset(self._get_content(section))
+        container = HSplit(
+            self._get_content(section),
+            height=Dimension(min=1),
+            width=Dimension(min=1, weight=4),
+            padding=0,
+            )
+        content.reset(container)
 
 
 class SidebarMenu(WindowContainer):

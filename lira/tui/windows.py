@@ -4,19 +4,21 @@ from textwrap import dedent
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
-from prompt_toolkit.layout import Dimension
-from prompt_toolkit.layout.containers import (
+from prompt_toolkit.key_binding import KeyBindings
+from prompt_toolkit.keys import Keys
+from prompt_toolkit.layout import (
     ConditionalContainer,
+    Dimension,
     DynamicContainer,
     HSplit,
     to_container,
 )
-from prompt_toolkit.widgets import Box, Button, Label, TextArea
+from prompt_toolkit.widgets import Box, Label, TextArea
 
 from lira import __version__
 from lira.tui.themes import theme
 from lira.tui.utils import exit_app, set_title
-from lira.tui.widgets import FormattedTextArea
+from lira.tui.widgets import Button, FormattedTextArea
 
 
 class WindowContainer:
@@ -27,15 +29,12 @@ class WindowContainer:
         self.tui = tui
         self.lira = self.tui.lira
         self.pages = []
-        self.container = DynamicContainer(self._get_default_container)
+        self.container = DynamicContainer(self.get_container)
 
     def _get_default_container(self):
         return to_container(Label("Empty container"))
 
     def focus(self):
-        if not hasattr(self.tui, "app"):
-            return
-
         layout = self.tui.app.layout
         window = next(layout.get_focusable_windows(), None)
         if window:
@@ -44,26 +43,24 @@ class WindowContainer:
     def get_inner_container(self):
         return getattr(self, self.inner_container)
 
-    def render(self, widget):
-        container = self.get_inner_container()
-        container.get_container = lambda: to_container(widget)
-        self.focus()
+    def get_container(self):
+        if self.pages:
+            return self.pages[-1]
+        return self._get_default_container()
 
     def push(self, widget):
         self.pages.append(widget)
-        self.render(widget)
+        self.focus()
 
     def pop(self):
         if len(self.pages) <= 1:
             return
         self.pages.pop()
-        prev_window = self.pages[-1]
-        self.render(prev_window)
+        self.focus()
 
     def reset(self, widget=None):
         widget = widget or self._get_default_container()
         self.pages = [widget]
-        self.render(widget)
 
     def __pt_container__(self):
         return self.container
@@ -75,8 +72,8 @@ class ContentArea(WindowContainer):
             f"""
             Welcome to Lira!
 
-            - Press <C-c> or <C-q> to exit.
-            - Navivate with <Tab> and the navigation keys.
+            - Press <Ctrl-c> or <Ctrl-q> to exit.
+            - Navigate with <Tab> and the arrow keys.
 
             Version: {__version__}
             """
@@ -166,20 +163,31 @@ class SidebarMenu(WindowContainer):
 
     def __init__(self, tui):
         super().__init__(tui)
-        self.list = DynamicContainer(self._get_default_container)
+        self.list = DynamicContainer(self.get_container)
         self.back_button = ConditionalContainer(
             Button("Back", handler=self.pop),
             filter=Condition(lambda: len(self.pages) > 1),
         )
+        self.exit_button = Button("Exit", handler=exit_app)
         self.container = HSplit(
             [
                 self.list,
                 self.back_button,
-                Button("Exit", handler=exit_app),
+                self.exit_button,
             ],
             height=Dimension(min=1),
             width=Dimension(min=1),
+            key_bindings=self.get_key_bindings(),
         )
+
+    def get_key_bindings(self):
+        keys = KeyBindings()
+
+        @keys.add(Keys.Backspace)
+        def _(event):
+            self.pop()
+
+        return keys
 
     def pop(self):
         super().pop()

@@ -7,7 +7,7 @@ themes = {
         "strong": "#fff bold",
         "literal": "#fff",
         "emphasis": "#fff italic",
-        "title": "#55f bold",
+        "title": "#fff bold",
         "separator": "#aaa",
         # Widgets
         "list-item.focused": "bg:#0055aa #ffffff",

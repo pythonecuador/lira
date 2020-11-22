@@ -158,7 +158,7 @@ class FormattedTextArea:
             input_processors=[FormatTextProcessor(), HighlightSelectionProcessor()],
             include_default_input_processors=False,
             focusable=focusable,
-            focus_on_click=True,
+            focus_on_click=focusable,
         )
         self.scrollbar = scrollbar
         right_margins = [

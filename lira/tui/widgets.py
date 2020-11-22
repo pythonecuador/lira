@@ -1,6 +1,8 @@
+import logging
 from functools import partial
 from textwrap import dedent
 
+from prompt_toolkit.application import get_app
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.formatted_text import HTML, fragment_list_to_text, to_formatted_text
@@ -29,6 +31,8 @@ from prompt_toolkit.widgets import Box
 from prompt_toolkit.widgets import Button as ToolkitButton
 
 from lira.tui.utils import set_title
+
+log = logging.getLogger(__name__)
 
 
 class Button(ToolkitButton):
@@ -62,6 +66,135 @@ class Button(ToolkitButton):
             ("class:button.text", text, handler),
             ("class:button.arrow", "]", handler),
         ]
+
+
+class FormatTextProcessor(Processor):
+
+    """
+    Custom processor to represent formatted text.
+
+    It makes use of :py:class:`FormattedBufferControl`.
+    """
+
+    def apply_transformation(self, transformation_input):
+        formatted_lines = transformation_input.buffer_control.formatted_lines
+        lineno = transformation_input.lineno
+        max_lineno = len(formatted_lines) - 1
+        if lineno > max_lineno:
+            log.warning(
+                "Index error when parsing document. max_lineno=%s lineno=%s",
+                max_lineno,
+                lineno,
+            )
+            lineno = max_lineno
+        line = formatted_lines[lineno]
+        return Transformation(to_formatted_text(line))
+
+
+class FormattedBufferControl(BufferControl):
+    def __init__(self, formatted_text, **kwargs):
+        self.formatted_lines = self._parse_formatted_text(formatted_text)
+        super().__init__(**kwargs)
+
+    def _parse_formatted_text(self, formatted_text):
+        """
+        Transform a formatted text with newlines into a list.
+
+        This is to make it compatible with the processor.
+        Each element represents a line of text.
+        """
+        lines = []
+        line = []
+        for format in formatted_text:
+            style, text, *_ = format
+            word = []
+            for c in text:
+                if c != "\n":
+                    word.append(c)
+                    continue
+
+                if word:
+                    line.append((style, "".join(word)))
+                    lines.append(line)
+                elif not word and line:
+                    lines.append(line)
+                else:
+                    lines.append([("", "")])
+                line = []
+                word = []
+            if word:
+                line.append((style, "".join(word)))
+        if line:
+            lines.append(line)
+        return lines
+
+
+class FormattedTextArea:
+
+    """Just like text area, but it accepts formatted content."""
+
+    def __init__(
+        self,
+        text="",
+        focusable=False,
+        wrap_lines=True,
+        width=None,
+        height=None,
+        scrollbar=False,
+        dont_extend_height=True,
+        dont_extend_width=False,
+        read_only=True,
+    ):
+        self.read_only = read_only
+        formatted_text = to_formatted_text(text)
+        plain_text = fragment_list_to_text(formatted_text)
+        self.buffer = Buffer(
+            document=Document(plain_text, 0),
+            read_only=Condition(lambda: self.read_only),
+        )
+        self.control = FormattedBufferControl(
+            buffer=self.buffer,
+            formatted_text=formatted_text,
+            input_processors=[FormatTextProcessor(), HighlightSelectionProcessor()],
+            include_default_input_processors=False,
+            focusable=focusable,
+            focus_on_click=True,
+        )
+        self.scrollbar = scrollbar
+        right_margins = [
+            ConditionalMargin(
+                ScrollbarMargin(display_arrows=True),
+                filter=Condition(lambda: self.scrollbar),
+            ),
+        ]
+        self.window = Window(
+            content=self.control,
+            width=width,
+            height=height,
+            wrap_lines=wrap_lines,
+            right_margins=right_margins,
+            dont_extend_height=dont_extend_height,
+            dont_extend_width=dont_extend_width,
+        )
+
+    @property
+    def document(self):
+        return self.buffer.document
+
+    @document.setter
+    def document(self, value):
+        self.buffer.set_document(value, bypass_readonly=True)
+
+    @property
+    def text(self):
+        return self.buffer.text
+
+    @text.setter
+    def text(self, text):
+        self.document = Document(text, 0)
+
+    def __pt_container__(self):
+        return self.window
 
 
 class ListElement:
@@ -197,6 +330,8 @@ class List:
 
     def mouse_select(self, index, mouse_event):
         if mouse_event.event_type == MouseEventType.MOUSE_UP:
+            app = get_app()
+            app.layout.focus(self)
             self.select(index)
 
     def select(self, index):
@@ -253,118 +388,6 @@ class List:
             self.select(self.index)
 
         return keys
-
-    def __pt_container__(self):
-        return self.window
-
-
-class FormatTextProcessor(Processor):
-    def apply_transformation(self, transformation_input):
-        formatted_lines = transformation_input.buffer_control.formatted_lines
-        lineno = transformation_input.lineno
-        lineno = min(lineno, len(formatted_lines) - 1)
-        line = formatted_lines[lineno]
-        return Transformation(to_formatted_text(line))
-
-
-class FormattedBufferControl(BufferControl):
-    def __init__(self, formatted_text, **kwargs):
-        self.formatted_lines = self._parse_formatted_text(formatted_text)
-        super().__init__(**kwargs)
-
-    def _parse_formatted_text(self, formatted_text):
-        """
-        Transform a formatted text with newlines into a list.
-
-        This is to make it compatible with the processor.
-        """
-        lines = []
-        line = []
-        for format in formatted_text:
-            style, text, *_ = format
-            word = []
-            for c in text:
-                if c != "\n":
-                    word.append(c)
-                    continue
-
-                if word:
-                    line.append((style, "".join(word)))
-                    lines.append(line)
-                elif not word and line:
-                    lines.append(line)
-                else:
-                    lines.append([("", "")])
-                line = []
-                word = []
-            if word:
-                line.append((style, "".join(word)))
-        if line:
-            lines.append(line)
-        return lines
-
-
-class FormattedTextArea:
-
-    """Just like text area, but it accepts formatted content."""
-
-    def __init__(
-        self,
-        text="",
-        focusable=False,
-        wrap_lines=True,
-        width=None,
-        height=None,
-        scrollbar=False,
-        dont_extend_height=True,
-        dont_extend_width=False,
-    ):
-        formatted_text = to_formatted_text(text)
-        plain_text = fragment_list_to_text(formatted_text)
-        self.buffer = Buffer(
-            document=Document(plain_text, 0),
-            read_only=True,
-        )
-        self.control = FormattedBufferControl(
-            buffer=self.buffer,
-            formatted_text=formatted_text,
-            input_processors=[FormatTextProcessor(), HighlightSelectionProcessor()],
-            include_default_input_processors=False,
-            focusable=focusable,
-            focus_on_click=True,
-        )
-        self.scrollbar = scrollbar
-        right_margins = [
-            ConditionalMargin(
-                ScrollbarMargin(display_arrows=True),
-                filter=Condition(lambda: self.scrollbar),
-            ),
-        ]
-        self.window = Window(
-            content=self.control,
-            width=width,
-            height=height,
-            wrap_lines=wrap_lines,
-            right_margins=right_margins,
-            dont_extend_height=dont_extend_height,
-            dont_extend_width=dont_extend_width,
-        )
-
-    @property
-    def document(self):
-        return self.buffer.document
-
-    @document.setter
-    def document(self, value):
-        self.buffer.set_document(value, bypass_readonly=True)
-
-    @property
-    def text(self):
-        return self.buffer.text
-
-    @text.setter
-    def text(self, text):
-        self.document = Document(text, 0)
 
     def __pt_container__(self):
         return self.window

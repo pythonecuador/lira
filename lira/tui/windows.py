@@ -67,6 +67,13 @@ class WindowContainer:
 
 
 class ContentArea(WindowContainer):
+    style = {
+        "Section": "title",
+        "Text": "text",
+        "Strong": "strong",
+        "Emphasis": "emphasis",
+    }
+
     def _get_default_container(self):
         text = dedent(
             f"""
@@ -99,7 +106,9 @@ class ContentArea(WindowContainer):
 
         tag = node.tagname
         if tag == "Section":
-            content.append(to_formatted_text(node.options.title, theme["nodes"][tag]))
+            content.append(
+                to_formatted_text(node.options.title, f"class:{self.style[tag]}")
+            )
 
         for child in node.children:
             tag = child.tagname
@@ -118,7 +127,9 @@ class ContentArea(WindowContainer):
                 content.append(to_formatted_text("\n\n [TestBlock]", ""))
 
             elif tag in ["Text", "Strong", "Emphasis"]:
-                content.append(to_formatted_text(child.text(), theme["nodes"][tag]))
+                content.append(
+                    to_formatted_text(child.text(), f"class:{self.style[tag]}")
+                )
 
         return content
 

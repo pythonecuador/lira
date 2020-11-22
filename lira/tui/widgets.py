@@ -290,6 +290,7 @@ class FormattedBufferControl(BufferControl):
 
                 if word:
                     line.append((style, "".join(word)))
+                    lines.append(line)
                 elif not word and line:
                     lines.append(line)
                 else:

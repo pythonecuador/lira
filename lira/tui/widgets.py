@@ -531,5 +531,5 @@ class ChapterSectionsList(LiraList):
             )
         return elements
 
-    def _select(self, section, index=0):
+    def _select(self, section):
         self.tui.content.render_section(section)

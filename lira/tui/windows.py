@@ -16,7 +16,6 @@ from prompt_toolkit.layout import (
 from prompt_toolkit.widgets import Box, Label, TextArea
 
 from lira import __version__
-from lira.tui.themes import theme
 from lira.tui.utils import exit_app, set_title
 from lira.tui.widgets import Button, FormattedTextArea
 
@@ -67,6 +66,13 @@ class WindowContainer:
 
 
 class ContentArea(WindowContainer):
+    style = {
+        "Section": "class:title",
+        "Text": "class:text",
+        "Strong": "class:strong",
+        "Emphasis": "class:emphasis",
+    }
+
     def get_container(self):
         if self.pages:
             return self._box(self.pages[-1])
@@ -103,7 +109,7 @@ class ContentArea(WindowContainer):
 
         tag = node.tagname
         if tag == "Section":
-            content.append(to_formatted_text(node.options.title, theme["nodes"][tag]))
+            content.append(to_formatted_text(node.options.title, self.style[tag]))
 
         for child in node.children:
             tag = child.tagname
@@ -122,7 +128,7 @@ class ContentArea(WindowContainer):
                 content.append(to_formatted_text("\n\n [TestBlock]", ""))
 
             elif tag in ["Text", "Strong", "Emphasis"]:
-                content.append(to_formatted_text(child.text(), theme["nodes"][tag]))
+                content.append(to_formatted_text(child.text(), self.style[tag]))
 
         return content
 

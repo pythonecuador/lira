@@ -8,8 +8,11 @@ themes = {
         "literal": "#fff",
         "emphasis": "#fff italic",
         "title": "#fff bold",
+        "description": "italic",
         "separator": "#aaa",
-        # Widgets
+        "key": "bold",
+        "value": "",
+        # Custom widgets
         "list-item.focused": "bg:#0055aa #ffffff",
     }
 }

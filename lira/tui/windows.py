@@ -67,6 +67,19 @@ class WindowContainer:
 
 
 class ContentArea(WindowContainer):
+    def get_container(self):
+        if self.pages:
+            return self._box(self.pages[-1])
+        return self._box(self._get_default_container())
+
+    def _box(self, body):
+        return Box(
+            body=body,
+            height=Dimension(min=1),
+            width=Dimension(min=1, weight=4),
+            padding=1,
+        )
+
     def _get_default_container(self):
         text = dedent(
             f"""
@@ -80,19 +93,10 @@ class ContentArea(WindowContainer):
         )
         text_area = TextArea(
             text=text.strip(),
-            style=theme["text"],
             focusable=False,
             read_only=True,
         )
-        return to_container(
-            Box(
-                height=Dimension(min=1),
-                width=Dimension(min=1, weight=4),
-                body=text_area,
-                padding=1,
-                style=theme["text"],
-            )
-        )
+        return text_area
 
     def _get_content(self, node):
         # TODO: parse and render individual nodes
@@ -111,15 +115,7 @@ class ContentArea(WindowContainer):
 
     def render_section(self, section):
         content = self.tui.content
-        content.reset(
-            Box(
-                height=Dimension(min=1),
-                width=Dimension(min=1, weight=4),
-                body=self._get_content(section),
-                padding=1,
-                style=theme["text"],
-            )
-        )
+        content.reset(self._get_content(section))
 
 
 class SidebarMenu(WindowContainer):
@@ -173,7 +169,6 @@ class StatusBar(WindowContainer):
             text=status,
             height=Dimension.exact(1),
             prompt=">>> ",
-            style=theme["text"],
             multiline=False,
             wrap_lines=False,
             focusable=False,

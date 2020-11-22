@@ -282,10 +282,6 @@ class FormattedBufferControl(BufferControl):
         line = []
         for format in formatted_text:
             style, text, *_ = format
-            if style:
-                line.append(format)
-                continue
-
             word = []
             for c in text:
                 if c != "\n":
@@ -293,7 +289,7 @@ class FormattedBufferControl(BufferControl):
                     continue
 
                 if word:
-                    line.append(("", "".join(word)))
+                    line.append((style, "".join(word)))
                 elif not word and line:
                     lines.append(line)
                 else:
@@ -301,7 +297,7 @@ class FormattedBufferControl(BufferControl):
                 line = []
                 word = []
             if word:
-                line.append(("", "".join(word)))
+                line.append((style, "".join(word)))
         if line:
             lines.append(line)
         return lines

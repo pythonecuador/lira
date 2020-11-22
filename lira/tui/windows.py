@@ -18,7 +18,7 @@ from prompt_toolkit.widgets import Box, Label, TextArea
 from lira import __version__
 from lira.tui.themes import theme
 from lira.tui.utils import exit_app, set_title
-from lira.tui.widgets import Button
+from lira.tui.widgets import Button, FormattedTextArea
 
 
 class WindowContainer:
@@ -95,31 +95,43 @@ class ContentArea(WindowContainer):
         )
 
     def _get_content(self, node):
-        # TODO: parse and render individual nodes
-        formated_content = []
+        content = []
+
+        tag = node.tagname
+        if tag == "Section":
+            content.append(to_formatted_text(node.options.title, theme["nodes"][tag]))
+
         for child in node.children:
-            text = child.text()
-            formated_content.append(
-                to_formatted_text(text, theme["nodes"][child.tagname])
-            )
-            if child.tagname == "Paragraph":
-                formated_content.append(to_formatted_text("\n", ""))
+            tag = child.tagname
 
-        label = Label(merge_formatted_text(formated_content))
+            if tag == "Section":
+                content.extend(self._get_content(node))
 
-        return label
+            elif tag == "Paragraph":
+                content.append(to_formatted_text("\n\n", ""))
+                content.extend(self._get_content(child))
+
+            elif tag == "CodeBlock":
+                content.append(to_formatted_text("\n\n" + child.text(), ""))
+
+            elif tag == "TestBlock":
+                content.append(to_formatted_text("\n\n [TestBlock]", ""))
+
+            elif tag in ["Text", "Strong", "Emphasis"]:
+                content.append(to_formatted_text(child.text(), theme["nodes"][tag]))
+
+        return content
 
     def render_section(self, section):
         content = self.tui.content
-        content.reset(
-            Box(
-                height=Dimension(min=1),
-                width=Dimension(min=1, weight=4),
-                body=self._get_content(section),
-                padding=1,
-                style=theme["text"],
-            )
+        parsed_section = merge_formatted_text(self._get_content(section))
+        container = HSplit(
+            [FormattedTextArea(parsed_section)],
+            height=Dimension(min=1),
+            width=Dimension(min=1, weight=4),
+            padding=0,
         )
+        content.reset(container)
 
 
 class SidebarMenu(WindowContainer):

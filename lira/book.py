@@ -100,7 +100,7 @@ class Book:
         "authors",
         "title",
         "description",
-        "created",
+        "published",
         "updated",
         "chapters",
     }

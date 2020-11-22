@@ -1,11 +1,14 @@
 from functools import partial
+from textwrap import dedent
 
+from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.formatted_text import HTML, fragment_list_to_text, to_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import (
+    BufferControl,
     ConditionalMargin,
     Dimension,
     FormattedTextControl,
@@ -13,6 +16,12 @@ from prompt_toolkit.layout import (
     ScrollbarMargin,
     Window,
     WindowAlign,
+)
+from prompt_toolkit.layout.processors import (
+    Document,
+    HighlightSelectionProcessor,
+    Processor,
+    Transformation,
 )
 from prompt_toolkit.layout.screen import Point
 from prompt_toolkit.mouse_events import MouseEventType
@@ -58,7 +67,7 @@ class Button(ToolkitButton):
 class ListElement:
 
     """
-    Element used by `List`.
+    Element used by :py:class:`List`.
 
     :param text: Text to be displayed.
     :param on_select: Function to be call when the element is selected.
@@ -77,7 +86,7 @@ class List:
     List widget.
 
     :param title: Any formatted text to be used as the title of the list.
-    :param elements: List of `ListElement`.
+    :param elements: List of :py:class:`ListElement`.
     :param get_bullet: A function (function(line)) to be called to get the
     bullet of the element in that line number.
     :param allow_select: If `True`, display an extra column indicating the
@@ -94,6 +103,7 @@ class List:
         align=WindowAlign.LEFT,
         get_bullet=None,
         allow_select=True,
+        scrollbar=True,
     ):
         self.index = 0
         self.get_bullet = get_bullet
@@ -102,6 +112,7 @@ class List:
         self.title = title
         self.allow_select = allow_select
         self.cursor = Point(0, 0)
+        self.scrollbar = scrollbar
         self.control = FormattedTextControl(
             text=self._get_text,
             focusable=True,
@@ -113,10 +124,14 @@ class List:
         right_margins = [
             ConditionalMargin(
                 ScrollbarMargin(display_arrows=True),
-                filter=Condition(lambda: False),
+                filter=Condition(lambda: self.scrollbar),
             ),
         ]
-        self.title_window = FormattedTextArea(text=self.title, wrap_lines=True)
+        self.title_window = FormattedTextArea(
+            text=self.title,
+            height=Dimension(min=1),
+            width=Dimension(min=1),
+        )
         self.list_window = Window(
             content=self.control,
             width=width,
@@ -243,6 +258,51 @@ class List:
         return self.window
 
 
+class FormatTextProcessor(Processor):
+    def apply_transformation(self, transformation_input):
+        formatted_lines = transformation_input.buffer_control.formatted_lines
+        lineno = transformation_input.lineno
+        lineno = min(lineno, len(formatted_lines) - 1)
+        line = formatted_lines[lineno]
+        return Transformation(to_formatted_text(line))
+
+
+class FormattedBufferControl(BufferControl):
+    def __init__(self, formatted_text, **kwargs):
+        self.formatted_lines = self._parse_formatted_text(formatted_text)
+        super().__init__(**kwargs)
+
+    def _parse_formatted_text(self, formatted_text):
+        """
+        Transform a formatted text with newlines into a list.
+
+        This is to make it compatible with the processor.
+        """
+        lines = []
+        line = []
+        for format in formatted_text:
+            style, text, *_ = format
+            word = []
+            for c in text:
+                if c != "\n":
+                    word.append(c)
+                    continue
+
+                if word:
+                    line.append((style, "".join(word)))
+                elif not word and line:
+                    lines.append(line)
+                else:
+                    lines.append([("", "")])
+                line = []
+                word = []
+            if word:
+                line.append((style, "".join(word)))
+        if line:
+            lines.append(line)
+        return lines
+
+
 class FormattedTextArea:
 
     """Just like text area, but it accepts formatted content."""
@@ -254,29 +314,64 @@ class FormattedTextArea:
         wrap_lines=True,
         width=None,
         height=None,
-        align=WindowAlign.LEFT,
-        style="",
+        scrollbar=False,
+        dont_extend_height=True,
+        dont_extend_width=False,
     ):
-        self.text = text
-        self.control = FormattedTextControl(
-            text=lambda: self.text,
-            focusable=focusable,
+        formatted_text = to_formatted_text(text)
+        plain_text = fragment_list_to_text(formatted_text)
+        self.buffer = Buffer(
+            document=Document(plain_text, 0),
+            read_only=True,
         )
+        self.control = FormattedBufferControl(
+            buffer=self.buffer,
+            formatted_text=formatted_text,
+            input_processors=[FormatTextProcessor(), HighlightSelectionProcessor()],
+            include_default_input_processors=False,
+            focusable=focusable,
+            focus_on_click=True,
+        )
+        self.scrollbar = scrollbar
+        right_margins = [
+            ConditionalMargin(
+                ScrollbarMargin(display_arrows=True),
+                filter=Condition(lambda: self.scrollbar),
+            ),
+        ]
         self.window = Window(
             content=self.control,
             width=width,
             height=height,
-            style="class:formatted-text-area " + style,
             wrap_lines=wrap_lines,
-            dont_extend_height=True,
-            dont_extend_width=False,
+            right_margins=right_margins,
+            dont_extend_height=dont_extend_height,
+            dont_extend_width=dont_extend_width,
         )
+
+    @property
+    def document(self):
+        return self.buffer.document
+
+    @document.setter
+    def document(self, value):
+        self.buffer.set_document(value, bypass_readonly=True)
+
+    @property
+    def text(self):
+        return self.buffer.text
+
+    @text.setter
+    def text(self, text):
+        self.document = Document(text, 0)
 
     def __pt_container__(self):
         return self.window
 
 
 class LiraList:
+
+    """Wrapped around :py:class:`List`."""
 
     allow_select = False
 
@@ -288,6 +383,8 @@ class LiraList:
             elements=self._get_elements(),
             get_bullet=self._get_bullet,
             allow_select=self.allow_select,
+            width=Dimension(min=1),
+            height=Dimension(min=1),
         )
 
     def _get_title(self):
@@ -304,6 +401,9 @@ class LiraList:
 
 
 class BooksList(LiraList):
+
+    """List of :py:class:`lira.book.Book`."""
+
     def _get_title(self):
         return HTML("<title>{}</title>").format("Books")
 
@@ -315,18 +415,58 @@ class BooksList(LiraList):
             elements.append(
                 ListElement(
                     text=title,
-                    on_select=partial(self.select, book, i),
+                    on_select=partial(self._select, book, i),
+                    on_focus=partial(self._focus, book, i),
                 )
             )
         return elements
 
-    def select(self, book, index=0):
+    def _select(self, book, index=0):
         widget = BookChaptersList(self.tui, book)
         set_title(book.metadata["title"])
         self.tui.menu.push(widget)
 
+    def _focus(self, book, index):
+        title = book.metadata["title"]
+        description = book.metadata["description"]
+        language = book.metadata["language"]
+        authors = ", ".join(book.metadata["authors"])
+        published = book.metadata["published"]
+        updated = book.metadata["updated"]
+        text = dedent(
+            """
+            <title>{title}</title>
+
+            <description>{description}</description>
+
+            <key>Authors</key><separator>:</separator> <value>{authors}</value>
+            <key>Language</key><separator>:</separator> <value>{language}</value>
+            <key>Published</key><separator>:</separator> <value>{published}</value>
+            """
+        ).strip()
+        if updated:
+            text += (
+                "\n<key>Updated</key><separator>:</separator> <value>{updated}</value>"
+            )
+        text_area = FormattedTextArea(
+            text=HTML(text).format(
+                title=title,
+                description=description,
+                authors=authors,
+                language=language,
+                published=published,
+                updated=updated,
+            ),
+            focusable=True,
+            scrollbar=True,
+        )
+        self.tui.content.reset(text_area)
+
 
 class BookChaptersList(LiraList):
+
+    """List of :py:class:`lira.book.BookChapter`."""
+
     def __init__(self, tui, book):
         self.book = book
         super().__init__(tui)
@@ -356,6 +496,8 @@ class BookChaptersList(LiraList):
 
 
 class ChapterSectionsList(LiraList):
+
+    """List of :py:class:`lira.parsers.nodes.Section`."""
 
     allow_select = True
 
@@ -389,5 +531,5 @@ class ChapterSectionsList(LiraList):
             )
         return elements
 
-    def _select(self, section, index=0):
+    def _select(self, section):
         self.tui.content.render_section(section)

@@ -15,7 +15,7 @@ class TestBook:
             "language": "en",
             "title": "Basic Introduction to Python",
             "description": "Basic introduction to Python",
-            "created": "16/10/2020",
+            "published": "16/10/2020",
             "updated": "16/10/2020",
             "authors": ["Santos Gallegos"],
             "chapters": {

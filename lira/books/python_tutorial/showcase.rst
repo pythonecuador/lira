@@ -40,5 +40,3 @@ For example:
   5.0
   >>> 8 / 5  # division always returns a floating point number
   1.6
-
-

@@ -21,7 +21,7 @@ class TestFormattedTextArea:
     def test_formatted_text_area(self):
         text = to_formatted_text("I'm a text area", style="bg:red")
         text_area = FormattedTextArea(text)
-        assert to_text(text_area) == "I'm a text area"
+        assert text_area.text == "I'm a text area"
 
 
 class TestList:
@@ -38,7 +38,7 @@ class TestList:
             elements=elements,
         )
 
-        assert to_text(list.title_window) == "Title"
+        assert list.title_window.text == "Title"
 
         expected = dedent(
             """

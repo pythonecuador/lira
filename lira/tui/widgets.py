@@ -314,6 +314,7 @@ class FormattedTextArea:
         wrap_lines=True,
         width=None,
         height=None,
+        scrollbar=False,
         dont_extend_height=True,
         dont_extend_width=False,
     ):
@@ -331,11 +332,19 @@ class FormattedTextArea:
             focusable=focusable,
             focus_on_click=True,
         )
+        self.scrollbar = scrollbar
+        right_margins = [
+            ConditionalMargin(
+                ScrollbarMargin(display_arrows=True),
+                filter=Condition(lambda: self.scrollbar),
+            ),
+        ]
         self.window = Window(
             content=self.control,
             width=width,
             height=height,
             wrap_lines=wrap_lines,
+            right_margins=right_margins,
             dont_extend_height=dont_extend_height,
             dont_extend_width=dont_extend_width,
         )
@@ -449,6 +458,7 @@ class BooksList(LiraList):
                 updated=updated,
             ),
             focusable=True,
+            scrollbar=True,
         )
         self.tui.content.reset(text_area)
 

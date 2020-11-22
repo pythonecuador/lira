@@ -129,7 +129,13 @@ class ContentArea(WindowContainer):
     def render_section(self, section):
         content = self.tui.content
         parsed_section = merge_formatted_text(self._get_content(section))
-        content.reset(FormattedTextArea(parsed_section))
+        content.reset(
+            FormattedTextArea(
+                parsed_section,
+                scrollbar=True,
+                focusable=True,
+            )
+        )
 
 
 class SidebarMenu(WindowContainer):

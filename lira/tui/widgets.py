@@ -261,7 +261,9 @@ class List:
 class FormatTextProcessor(Processor):
     def apply_transformation(self, transformation_input):
         formatted_lines = transformation_input.buffer_control.formatted_lines
-        line = formatted_lines[transformation_input.lineno]
+        lineno = transformation_input.lineno
+        lineno = min(lineno, len(formatted_lines) - 1)
+        line = formatted_lines[lineno]
         return Transformation(to_formatted_text(line))
 
 

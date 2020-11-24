@@ -446,7 +446,7 @@ class BooksList(LiraList):
         return elements
 
     def _select(self, book, index=0):
-        widget = BookChaptersList(self.tui, book)
+        widget = BookChaptersList(tui=self.tui, book=book)
         set_title(book.metadata["title"])
         self.tui.menu.push(widget)
 
@@ -515,7 +515,11 @@ class BookChaptersList(LiraList):
         return elements
 
     def _select(self, chapter, index):
-        widget = ChapterSectionsList(self.tui, chapter, index)
+        widget = ChapterSectionsList(
+            tui=self.tui,
+            chapter=chapter,
+            index=index,
+        )
         self.tui.menu.push(widget)
 
 

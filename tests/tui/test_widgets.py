@@ -1,10 +1,24 @@
+from pathlib import Path
 from textwrap import dedent
+from unittest import mock
 
 from prompt_toolkit.formatted_text import to_formatted_text
 
-from lira.tui.widgets import Button, FormattedTextArea, List, ListElement
+from lira.app import LiraApp
+from lira.tui.widgets import (
+    BookChaptersList,
+    BooksList,
+    Button,
+    ChapterSectionsList,
+    FormattedTextArea,
+    List,
+    ListElement,
+)
 
 from .utils import to_text
+
+data_dir = Path(__file__).parent / "../data"
+config_file = data_dir / "books/config.yaml"
 
 
 class TestButton:
@@ -68,3 +82,84 @@ class TestList:
         list.select(1)
         assert list.current_element.text == "Two"
         assert to_text(list.list_window) == expected
+
+
+class TestLiraLists:
+    def setup_method(self):
+        with mock.patch("lira.app.CONFIG_FILE", config_file):
+            self.app = LiraApp()
+            self.app.setup()
+
+        self.tui = mock.MagicMock()
+        self.tui.lira = self.app
+
+    def test_book_list(self):
+        books_list = BooksList(tui=self.tui)
+        list = books_list.container
+
+        assert list.title_window.text == "Books"
+        expected = dedent(
+            """
+            Intro to Lira
+            Basic Introduction to Python
+            """
+        ).strip()
+        assert to_text(list.list_window) == expected
+
+        assert books_list._get_bullet(0) == "• "
+
+        # Changing focus updates the content window.
+        list.next()
+        self.tui.content.reset.assert_called_once()
+
+        # Selecting an item updates the list.
+        list.select(0)
+        self.tui.menu.push.assert_called_once()
+
+    def test_book_chapters_list(self):
+        book = self.app.books[1]
+        book.parse()
+        chapters_list = BookChaptersList(tui=self.tui, book=book)
+        list = chapters_list.container
+
+        assert list.title_window.text == "Basic Introduction to Python"
+        expected = dedent(
+            """
+            Introduction
+            Nested Content
+            """
+        ).strip()
+        assert to_text(list.list_window) == expected
+
+        assert chapters_list._get_bullet(0) == "1. "
+
+        # Selecting an item updates the list.
+        list.select(0)
+        self.tui.menu.push.assert_called_once()
+
+    def test_chapter_sections_list(self):
+        book = self.app.books[1]
+        book.parse()
+        chapter = book.chapters[0]
+        chapter.parse()
+
+        sections_list = ChapterSectionsList(tui=self.tui, chapter=chapter, index=0)
+        list = sections_list.container
+
+        # The first section is rendered by default.
+        assert list.title_window.text == "Basic Introduction to Python > Introduction"
+        expected = dedent(
+            """
+            Comments
+            """
+        ).strip()
+        assert to_text(list.list_window) == expected
+        self.tui.content.render_section.assert_called_once()
+
+        assert sections_list._get_bullet(0) == "1.1. "
+        assert sections_list._get_bullet(1) == "1.2. "
+
+        # Selecting an item updates the content.
+        self.tui.reset_mock()
+        list.select(0)
+        self.tui.content.render_section.assert_called_once()

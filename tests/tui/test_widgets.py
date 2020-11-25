@@ -2,7 +2,8 @@ from pathlib import Path
 from textwrap import dedent
 from unittest import mock
 
-from prompt_toolkit.formatted_text import to_formatted_text
+from prompt_toolkit.formatted_text import HTML, to_formatted_text
+from prompt_toolkit.mouse_events import MouseEventType
 
 from lira.app import LiraApp
 from lira.tui.widgets import (
@@ -36,6 +37,57 @@ class TestFormattedTextArea:
         text = to_formatted_text("I'm a text area", style="bg:red")
         text_area = FormattedTextArea(text)
         assert text_area.text == "I'm a text area"
+
+        formatted_text = dedent(
+            """
+            <title>I'm a title</title>
+
+            I'm <strong>bold</strong>!
+
+            <end>Do we end here?</end>
+            """
+        ).strip()
+        formatted_text = HTML(formatted_text)
+        plain_text = dedent(
+            """
+            I'm a title
+
+            I'm bold!
+
+            Do we end here?
+            """
+        ).strip()
+
+        text_area = FormattedTextArea(formatted_text)
+        assert text_area.text == plain_text
+
+        formatted_text = dedent(
+            """
+            <title>I'm a title</title>
+
+            I'm <strong>bold</strong>!
+
+            <end>Do we end here?</end>
+
+            No, here.
+
+            """
+        ).strip()
+        formatted_text = HTML(formatted_text)
+        plain_text = dedent(
+            """
+            I'm a title
+
+            I'm bold!
+
+            Do we end here?
+
+            No, here.
+
+            """
+        ).strip()
+        text_area.text = formatted_text
+        assert text_area.text == plain_text
 
 
 class TestList:
@@ -81,6 +133,17 @@ class TestList:
 
         list.select(1)
         assert list.current_element.text == "Two"
+        assert to_text(list.list_window) == expected
+
+        mouse_event = mock.MagicMock()
+        mouse_event.event_type = MouseEventType.MOUSE_DOWN
+        list.mouse_select(index=0, mouse_event=mouse_event)
+        assert list.current_element.text == "Two"
+        assert to_text(list.list_window) == expected
+
+        mouse_event.event_type = MouseEventType.MOUSE_UP
+        list.mouse_select(index=0, mouse_event=mouse_event)
+        assert list.current_element.text == "One"
         assert to_text(list.list_window) == expected
 
 

@@ -20,6 +20,7 @@ setuptools.setup(
         "docutils==0.16",
         "PyYAML==5.3.1",
         "prompt-toolkit==3.0.7",
+        "Pygments==2.7.2",
     ],
     entry_points={
         "console_scripts": [

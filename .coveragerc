@@ -3,6 +3,8 @@ branch = True
 source =
   lira/
   tests/
+omit =
+  */__main__.py
 
 [report]
 exclude_lines =

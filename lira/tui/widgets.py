@@ -96,6 +96,9 @@ class FormattedBufferControl(BufferControl):
         self.formatted_lines = self._parse_formatted_text(formatted_text)
         super().__init__(**kwargs)
 
+    def update_formatted_text(self, formatted_text):
+        self.formatted_lines = self._parse_formatted_text(formatted_text)
+
     def _parse_formatted_text(self, formatted_text):
         """
         Transform a formatted text with newlines into a list.
@@ -191,7 +194,10 @@ class FormattedTextArea:
 
     @text.setter
     def text(self, text):
-        self.document = Document(text, 0)
+        formatted_text = to_formatted_text(text)
+        self.control.update_formatted_text(formatted_text)
+        plain_text = fragment_list_to_text(formatted_text)
+        self.document = Document(plain_text, 0)
 
     def __pt_container__(self):
         return self.window

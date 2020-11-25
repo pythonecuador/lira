@@ -63,6 +63,27 @@ class TestSidebarMenu:
         label = children[0].get_container()
         assert label.text == "First"
 
+    def test_pop_all_pages(self):
+        first_label = Label("First")
+        self.window.push(first_label)
+        assert len(self.window.pages) == 1
+
+        # We can't pop the last page.
+        self.window.pop()
+        self.window.pop()
+        assert len(self.window.pages) == 1
+
+        children = to_container(self.window).get_children()
+        label = children[0].get_container()
+        assert label.text == "First"
+
+        # We can reset the pages to the default container.
+        self.window.reset()
+        assert len(self.window.pages) == 1
+        children = to_container(self.window).get_children()
+        label = children[0].get_container()
+        assert label.content.text() == "Empty container"
+
 
 class TestStatusBar:
     def _get_current_status(self, window):

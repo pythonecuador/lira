@@ -1,9 +1,14 @@
 import asyncio
-from textwrap import dedent
+from textwrap import dedent, indent
 
+import pygments
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
+from prompt_toolkit.formatted_text import (
+    PygmentsTokens,
+    merge_formatted_text,
+    to_formatted_text,
+)
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import (
@@ -16,7 +21,7 @@ from prompt_toolkit.layout import (
 from prompt_toolkit.widgets import Box, Label, TextArea
 
 from lira import __version__
-from lira.tui.utils import exit_app, set_title
+from lira.tui.utils import exit_app, get_lexer, set_title
 from lira.tui.widgets import Button, FormattedTextArea
 
 
@@ -118,11 +123,12 @@ class ContentArea(WindowContainer):
                 content.extend(self._get_content(node))
 
             elif tag == "Paragraph":
-                content.append(to_formatted_text("\n\n", ""))
+                content.extend(self._get_separator())
                 content.extend(self._get_content(child))
 
             elif tag == "CodeBlock":
-                content.append(to_formatted_text("\n\n" + child.text(), ""))
+                content.extend(self._get_separator())
+                content.extend(self._parse_code_block(child))
 
             elif tag == "TestBlock":
                 content.append(to_formatted_text("\n\n [TestBlock]", ""))
@@ -131,6 +137,21 @@ class ContentArea(WindowContainer):
                 content.append(to_formatted_text(child.text(), self.style[tag]))
 
         return content
+
+    def _get_separator(self):
+        return [to_formatted_text("\n\n")]
+
+    def _parse_code_block(self, node):
+        code = indent(node.text(), " " * 2)
+        lexer = get_lexer(node.options.language)
+        if lexer:
+            formatted_text = PygmentsTokens(pygments.lex(code=code, lexer=lexer))
+        else:
+            formatted_text = to_formatted_text(
+                code,
+                style="class:text",
+            )
+        return [formatted_text]
 
     def render_section(self, section):
         content = self.tui.content

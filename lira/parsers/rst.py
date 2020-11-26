@@ -1,3 +1,4 @@
+import importlib
 import logging
 
 from docutils.frontend import OptionParser
@@ -7,6 +8,7 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser
 from lira.parsers import nodes as booknodes
+from lira.validators import Validator
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +28,18 @@ class DirectiveNode(Element):
     tagname = "directive"
 
 
-def importable(value):
-    # TODO: check if value can be imported
-    return value
+def is_importable(value):
+    module_name, class_name = value.rsplit(".", 1)
+    try:
+        TargetClass = getattr(importlib.import_module(module_name), class_name, None)
+        if TargetClass is None or not issubclass(TargetClass, Validator):
+            raise ValueError
+        else:
+            return value
+
+    except ImportError:
+
+        raise ValueError
 
 
 class BaseDirective(Directive):
@@ -72,7 +83,7 @@ class TestBlockDirective(BaseDirective):
 
     option_spec = {
         "help": str,
-        "validator": importable,
+        "validator": is_importable,
     }
     has_content = True
 

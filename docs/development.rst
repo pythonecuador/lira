@@ -76,6 +76,31 @@ If you are having problems,
 you can check the logs at ``~/.local/share/lira/log/lira.log``,
 or at ``~/AppData/Local/lira-data/log/lira.log`` if you are using Windows.
 
+To debug with the lira's terminal interface running you may need 
+`python-remote-pdb <https://github.com/ionelmc/python-remote-pdb>`__, 
+install it with:
+
+.. code-block:: bash
+
+   pip install remote-pdb
+
+It works just as pdb, import it with:
+
+.. code-block:: python
+
+   from remote_pdb import set_trace
+   set_trace()
+
+And to connect to it from another terminal:
+
+.. code-block:: bash
+
+   telnet 127.0.0.1 4444
+
+For more insights about it, please read the
+`python-remote-pdb <https://github.com/ionelmc/python-remote-pdb>`__ 
+documentation.
+
 Roadmap
 -------
 

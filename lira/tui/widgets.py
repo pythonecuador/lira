@@ -4,8 +4,14 @@ from textwrap import dedent
 
 from prompt_toolkit.application import get_app
 from prompt_toolkit.buffer import Buffer
+from prompt_toolkit.data_structures import Point
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.formatted_text import HTML, fragment_list_to_text, to_formatted_text
+from prompt_toolkit.formatted_text import (
+    HTML,
+    fragment_list_to_text,
+    split_lines,
+    to_formatted_text,
+)
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.keys import Keys
@@ -25,7 +31,6 @@ from prompt_toolkit.layout.processors import (
     Processor,
     Transformation,
 )
-from prompt_toolkit.layout.screen import Point
 from prompt_toolkit.mouse_events import MouseEventType
 from prompt_toolkit.widgets import Box
 from prompt_toolkit.widgets import Button as ToolkitButton
@@ -92,44 +97,42 @@ class FormatTextProcessor(Processor):
 
 
 class FormattedBufferControl(BufferControl):
+
+    """Control to support formatted_text and mouse events."""
+
     def __init__(self, formatted_text, **kwargs):
-        self.formatted_lines = self._parse_formatted_text(formatted_text)
+        self.formatted_lines = list(split_lines(formatted_text))
         super().__init__(**kwargs)
 
     def update_formatted_text(self, formatted_text):
-        self.formatted_lines = self._parse_formatted_text(formatted_text)
+        self.formatted_lines = list(split_lines(formatted_text))
 
-    def _parse_formatted_text(self, formatted_text):
+    def mouse_handler(self, mouse_event):
         """
-        Transform a formatted text with newlines into a list.
+        Handle formatted text handlers.
 
-        This is to make it compatible with the processor.
-        Each element represents a line of text.
+        Taken from ``FormattedTextControl.mouse_handler``.
         """
-        lines = []
-        line = []
-        for format in formatted_text:
-            style, text, *_ = format
-            word = []
-            for c in text:
-                if c != "\n":
-                    word.append(c)
-                    continue
+        response = super().mouse_handler(mouse_event)
 
-                if word:
-                    line.append((style, "".join(word)))
-                    lines.append(line)
-                elif not word and line:
-                    lines.append(line)
+        if mouse_event.position.y >= len(self.formatted_lines):
+            return response
+
+        fragments = self.formatted_lines[mouse_event.position.y]
+        # Find position in the fragment list.
+        xpos = mouse_event.position.x
+
+        # Find mouse handler for this character.
+        count = 0
+        for item in fragments:
+            count += len(item[1])
+            if count >= xpos:
+                if len(item) >= 3:
+                    handler = item[2]
+                    return handler(mouse_event)
                 else:
-                    lines.append([("", "")])
-                line = []
-                word = []
-            if word:
-                line.append((style, "".join(word)))
-        if line:
-            lines.append(line)
-        return lines
+                    break
+        return response
 
 
 class FormattedTextArea:

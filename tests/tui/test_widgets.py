@@ -2,8 +2,9 @@ from pathlib import Path
 from textwrap import dedent
 from unittest import mock
 
+from prompt_toolkit.data_structures import Point
 from prompt_toolkit.formatted_text import HTML, to_formatted_text
-from prompt_toolkit.mouse_events import MouseEventType
+from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 
 from lira.app import LiraApp
 from lira.tui.widgets import (
@@ -89,6 +90,41 @@ class TestFormattedTextArea:
         text_area.text = formatted_text
         assert text_area.text == plain_text
 
+    def test_mouse_handler(self):
+        handler = mock.MagicMock()
+        handler_two = mock.MagicMock()
+        mouse_event = MouseEvent(Point(0, 0), MouseEventType.MOUSE_UP)
+        formatted_text = to_formatted_text(
+            [
+                ("", "hello", lambda x: handler(x)),
+                ("", "world", lambda x: handler_two(x)),
+            ]
+        )
+        text_area = FormattedTextArea(formatted_text)
+
+        # Click on first character.
+        text_area.control.mouse_handler(mouse_event)
+        handler.assert_called_once()
+        handler_two.assert_not_called()
+
+        # Click outside the text area.
+        mouse_event = MouseEvent(Point(99, 99), MouseEventType.MOUSE_UP)
+        handler.reset_mock()
+        handler_two.reset_mock()
+        text_area.control.mouse_handler(mouse_event)
+        handler.assert_not_called()
+        handler_two.assert_not_called()
+
+    def test_no_mouse_handler(self):
+        mouse_event = MouseEvent(Point(0, 0), MouseEventType.MOUSE_UP)
+        handler = mock.MagicMock()
+        formatted_text = to_formatted_text(
+            [("", "hello"), ("", "world", lambda x: handler(x))]
+        )
+        text_area = FormattedTextArea(formatted_text)
+        text_area.control.mouse_handler(mouse_event)
+        handler.assert_not_called()
+
 
 class TestList:
     def test_list(self):
@@ -135,8 +171,7 @@ class TestList:
         assert list.current_element.text == "Two"
         assert to_text(list.list_window) == expected
 
-        mouse_event = mock.MagicMock()
-        mouse_event.event_type = MouseEventType.MOUSE_DOWN
+        mouse_event = MouseEvent(Point(0, 0), MouseEventType.MOUSE_DOWN)
         list.mouse_select(index=0, mouse_event=mouse_event)
         assert list.current_element.text == "Two"
         assert to_text(list.list_window) == expected

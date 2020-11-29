@@ -1,6 +1,6 @@
 import pytest
 
-from lira.parsers import nodes
+from lira.parsers import State, nodes
 
 
 class TestNodes:
@@ -49,15 +49,18 @@ class TestNodes:
 
     def test_test_block_node(self):
         node = nodes.TestBlock(
+            ["# Write a comment"],
             validator="lira.validators.Validator",
-            help="Validate me",
+            language="python",
+            state=State.UNKNOWN,
             description="I'm a validator",
         )
         assert node.tagname == "TestBlock"
         assert node.options.validator == "lira.validators.Validator"
-        assert node.options.help == "Validate me"
+        assert node.options.language == "python"
         assert node.options.description == "I'm a validator"
-        assert node.text() == "I'm a validator"
+        assert node.options.state == State.UNKNOWN
+        assert node.text() == "# Write a comment"
         assert str(node) == "<TestBlock lira.validators.Validator: I'm a validator>"
 
     @pytest.mark.parametrize(

@@ -1,4 +1,4 @@
-from functools import namedtuple
+from collections import namedtuple
 
 
 class Node:
@@ -202,14 +202,15 @@ class TestBlock(Node):
 
     - validator: dotted path to a :py:class:`lira.validator.Validator` class.
     - description
-    - help
+    - state
+    - language
     """
 
     is_terminal = True
-    valid_options = {"validator", "help", "description"}
+    valid_options = {"validator", "description", "state", "language"}
 
     def text(self):
-        return self.options.description
+        return "\n".join(self.content)
 
     def __repr__(self):
         description = self.options.description

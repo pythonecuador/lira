@@ -1,3 +1,4 @@
+from enum import Enum
 from pathlib import Path
 
 
@@ -23,3 +24,9 @@ class BaseParser:
 
     def parse_content(self):
         raise NotImplementedError
+
+
+class State(Enum):
+    UNKNOWN = "unknown"
+    INVALID = "invalid"
+    VALID = "valid"

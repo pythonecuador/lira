@@ -1,14 +1,9 @@
 import asyncio
-from textwrap import dedent, indent
+from textwrap import dedent
 
-import pygments
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.formatted_text import (
-    PygmentsTokens,
-    merge_formatted_text,
-    to_formatted_text,
-)
+from prompt_toolkit.formatted_text import merge_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import (
@@ -21,7 +16,8 @@ from prompt_toolkit.layout import (
 from prompt_toolkit.widgets import Box, Label, TextArea
 
 from lira import __version__
-from lira.tui.utils import exit_app, get_lexer, set_title
+from lira.tui.render import Renderer
+from lira.tui.utils import exit_app, set_title
 from lira.tui.widgets import Button, FormattedTextArea
 
 
@@ -71,13 +67,6 @@ class WindowContainer:
 
 
 class ContentArea(WindowContainer):
-    style = {
-        "Section": "class:title",
-        "Text": "class:text",
-        "Strong": "class:strong",
-        "Emphasis": "class:emphasis",
-    }
-
     def get_container(self):
         if self.pages:
             return self._box(self.pages[-1])
@@ -109,56 +98,12 @@ class ContentArea(WindowContainer):
         )
         return text_area
 
-    def _get_content(self, node):
-        content = []
-
-        tag = node.tagname
-        if tag == "Section":
-            content.append(to_formatted_text(node.options.title, self.style[tag]))
-
-        for child in node.children:
-            tag = child.tagname
-
-            if tag == "Section":
-                content.extend(self._get_content(node))
-
-            elif tag == "Paragraph":
-                content.extend(self._get_separator())
-                content.extend(self._get_content(child))
-
-            elif tag == "CodeBlock":
-                content.extend(self._get_separator())
-                content.extend(self._parse_code_block(child))
-
-            elif tag == "TestBlock":
-                content.append(to_formatted_text("\n\n [TestBlock]", ""))
-
-            elif tag in ["Text", "Strong", "Emphasis"]:
-                content.append(to_formatted_text(child.text(), self.style[tag]))
-
-        return content
-
-    def _get_separator(self):
-        return [to_formatted_text("\n\n")]
-
-    def _parse_code_block(self, node):
-        code = indent(node.text(), " " * 2)
-        lexer = get_lexer(node.options.language)
-        if lexer:
-            formatted_text = PygmentsTokens(pygments.lex(code=code, lexer=lexer))
-        else:
-            formatted_text = to_formatted_text(
-                code,
-                style="class:text",
-            )
-        return [formatted_text]
-
     def render_section(self, section):
-        content = self.tui.content
-        parsed_section = merge_formatted_text(self._get_content(section))
-        content.reset(
+        renderer = Renderer()
+        formatted_content = merge_formatted_text(renderer.render(section))
+        self.tui.content.reset(
             FormattedTextArea(
-                parsed_section,
+                formatted_content,
                 scrollbar=True,
                 focusable=True,
             )

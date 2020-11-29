@@ -1,5 +1,4 @@
 from pathlib import Path
-from unittest import mock
 
 from prompt_toolkit.formatted_text import (
     fragment_list_to_text,
@@ -8,7 +7,7 @@ from prompt_toolkit.formatted_text import (
 )
 
 from lira.book import Book
-from lira.tui.windows import ContentArea
+from lira.tui.render import Renderer
 
 books_path = Path(__file__).parent / "../data/books"
 
@@ -17,11 +16,13 @@ class TestRenderer:
     def setup_method(self):
         book = Book(root=books_path / "renderer")
         book.parse(all=True)
-        chapter = book.chapters[0]
-        self.toc = chapter.toc()
+        self.chapters = book.chapters
+        self.renderer = Renderer()
 
-        tui = mock.MagicMock()
-        self.window = ContentArea(tui=tui)
+    def _to_text(self, formatted_text_list):
+        return fragment_list_to_text(
+            to_formatted_text(merge_formatted_text(formatted_text_list))
+        )
 
     def test_code_block(self):
         expected = """
@@ -33,10 +34,10 @@ This is a Python code block:
       print("Hello world")
 """
         expected = expected.lstrip()
-        chapter = self.toc[0][0]
-        content = self.window._get_content(chapter)
-        result = fragment_list_to_text(to_formatted_text(merge_formatted_text(content)))
-        assert result == expected
+        toc = self.chapters[0].toc()
+        section = toc[0][0]
+        content = self.renderer.render(section)
+        assert self._to_text(content) == expected
 
     def test_unknow_codeblock(self):
         expected = """
@@ -46,7 +47,46 @@ This is an unknown or unsupported language:
 
   I don't exist."""
         expected = expected.lstrip()
-        chapter = self.toc[1][0]
-        content = self.window._get_content(chapter)
-        result = fragment_list_to_text(to_formatted_text(merge_formatted_text(content)))
-        assert result == expected
+        toc = self.chapters[0].toc()
+        section = toc[1][0]
+        content = self.renderer.render(section)
+        assert self._to_text(content) == expected
+
+    def test_test_block(self):
+        expected = """
+Python
+
+This is a Python test block:
+
+┌─ Write a comment ────────
+
+- [Edit] [Load] [Run] (•) -
+
+  # Put your comment below
+
+
+└──────────────────────────"""
+        expected = expected.lstrip()
+        toc = self.chapters[1].toc()
+        section = toc[0][0]
+        content = self.renderer.render(section, width=27)
+        assert self._to_text(content) == expected
+
+    def test_test_block_no_language(self):
+        expected = """
+Plain text
+
+This is just plain text:
+
+┌─ Who is Guido? ──────────
+
+- [Edit] [Load] [Run] (•) -
+
+  He's the creator of something...
+
+└──────────────────────────"""
+        expected = expected.lstrip()
+        toc = self.chapters[1].toc()
+        section = toc[1][0]
+        content = self.renderer.render(section, width=27)
+        assert self._to_text(content) == expected

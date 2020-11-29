@@ -5,7 +5,7 @@ from docutils.nodes import Element
 from docutils.parsers.rst import Directive, Parser, directives
 from docutils.utils import new_document
 
-from lira.parsers import BaseParser
+from lira.parsers import BaseParser, State
 from lira.parsers import nodes as booknodes
 
 logger = logging.getLogger(__name__)
@@ -60,20 +60,26 @@ class TestBlockDirective(BaseDirective):
     The first line of the directive is the description of it.
     Options:
 
-    - help: Optional help text.
     - validator: A dotted path to a subclass of `lira.validators.Validator`.
+    - language: Optional language used for highlighting of the content.
+
+    The content can be used to display a default text.
 
     Example:
 
     .. test:: Write a comment
-       :help: Just write a simple comment :)
        :validator: lira.validators.CommentValidator
+       :language: python
+
+       # Just write a simple comment :)
     """
 
     option_spec = {
-        "help": str,
         "validator": importable,
+        "language": str,
     }
+    required_arguments = 1
+    final_argument_whitespace = True
     has_content = True
 
 
@@ -136,9 +142,9 @@ class RSTParser(BaseParser):
             elif tag == "directive":
                 directive_name = child.attributes.get("name")
                 if directive_name == "test-block":
-                    nodes.append(self._parse_test(child))
+                    nodes.append(self._parse_test_block(child))
                 elif directive_name == "code-block":
-                    nodes.append(self._parse_code(child))
+                    nodes.append(self._parse_code_block(child))
             elif tag in self.terminal_nodes:
                 nodes.append(self.terminal_nodes[tag](child.astext()))
             elif tag in self.container_nodes:
@@ -147,7 +153,7 @@ class RSTParser(BaseParser):
                 logger.warning("Node with tag %(tag)s is not supported", {"tag": tag})
         return nodes
 
-    def _parse_code(self, node):
+    def _parse_code_block(self, node):
         attrs = node.attributes
         language = attrs["arguments"][0]
         code = list(attrs["content"])
@@ -156,16 +162,19 @@ class RSTParser(BaseParser):
             language=language,
         )
 
-    def _parse_test(self, node):
+    def _parse_test_block(self, node):
         attrs = node.attributes
-        description = attrs["content"][0]
+        description = attrs["arguments"][0]
         options = attrs["options"]
-        help = options.get("help", "")
         validator = options["validator"]
+        language = options.get("language")
+        content = list(attrs["content"])
         return booknodes.TestBlock(
+            content,
             validator=validator,
             description=description,
-            help=help,
+            state=State.UNKNOWN,
+            language=language,
         )
 
     def _parse_section(self, node):

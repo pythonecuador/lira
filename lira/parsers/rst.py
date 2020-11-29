@@ -52,6 +52,16 @@ class CodeBlockDirective(BaseDirective):
     required_arguments = 1
 
 
+def validate_state(value):
+    value = value.lower().strip()
+    if not value:
+        return State.UNKNOWN
+    for state in State:
+        if value == state.value:
+            return state
+    raise ValueError("Invalid state")
+
+
 class TestBlockDirective(BaseDirective):
 
     """
@@ -62,6 +72,7 @@ class TestBlockDirective(BaseDirective):
 
     - validator: A dotted path to a subclass of `lira.validators.Validator`.
     - language: Optional language used for highlighting of the content.
+    - state: Optional initial state of the test block.
 
     The content can be used to display a default text.
 
@@ -77,6 +88,7 @@ class TestBlockDirective(BaseDirective):
     option_spec = {
         "validator": importable,
         "language": str,
+        "state": validate_state,
     }
     required_arguments = 1
     final_argument_whitespace = True
@@ -167,13 +179,14 @@ class RSTParser(BaseParser):
         description = attrs["arguments"][0]
         options = attrs["options"]
         validator = options["validator"]
+        state = options.get("state", State.UNKNOWN)
         language = options.get("language")
         content = list(attrs["content"])
         return booknodes.TestBlock(
             content,
             validator=validator,
             description=description,
-            state=State.UNKNOWN,
+            state=state,
             language=language,
         )
 

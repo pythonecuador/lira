@@ -30,13 +30,17 @@ Python
 
 This is a Python code block:
 
+┌─ [ Copy ] ──────────────────────
+
   for _ in range(3):
       print("Hello world")
-"""
+
+
+└─────────────────────────────────"""
         expected = expected.lstrip()
         toc = self.chapters[0].toc()
         section = toc[0][0]
-        content = self.renderer.render(section)
+        content = self.renderer.render(section, width=34)
         assert self._to_text(content) == expected
 
     def test_unknow_codeblock(self):
@@ -45,11 +49,15 @@ Unknown
 
 This is an unknown or unsupported language:
 
-  I don't exist."""
+┌─ [ Copy ] ──────────────────────
+
+  I don't exist.
+
+└─────────────────────────────────"""
         expected = expected.lstrip()
         toc = self.chapters[0].toc()
         section = toc[1][0]
-        content = self.renderer.render(section)
+        content = self.renderer.render(section, width=34)
         assert self._to_text(content) == expected
 
     def test_test_block(self):

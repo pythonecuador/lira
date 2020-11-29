@@ -39,7 +39,7 @@ class Renderer:
                 content.extend(self._render(child.children, width=width))
             elif tag == "CodeBlock":
                 content.extend(self._render_separator())
-                content.extend(self._render_code_block(child))
+                content.extend(self._render_code_block(child, width=width))
             elif tag == "TestBlock":
                 content.extend(self._render_separator())
                 content.extend(self._render_test_block(child, width=width))
@@ -62,13 +62,6 @@ class Renderer:
             )
         return formatted_text
 
-    def _render_code_block(self, node):
-        return [
-            self._render_highlighted_block(
-                content=node.text(), language=node.options.language
-            )
-        ]
-
     def _render_top_seperator(self, title=None, width=60):
         title = title or ""
         formatted_text = [
@@ -82,7 +75,8 @@ class Renderer:
                     ("", " "),
                 ]
             )
-        top_width = max(0, width - len(title) - 4)
+        title_len = len(title) + 2 if title else 0
+        top_width = max(0, width - title_len - 2)
         formatted_text.append(
             ("class:border.inner", Border.HORIZONTAL * top_width),
         )
@@ -99,12 +93,28 @@ class Renderer:
             ]
         )
 
-    def _render_menu(self, items, state=None, width=60):
-        formatted_text = [
-            ("class:border.inner", "-"),
-            ("", " "),
-        ]
-        char_len = 2
+    def _render_menu(self, items, state=None, width=60, top=False):
+        seperator = "-"
+        char_len = 0
+        formatted_text = []
+        if top:
+            seperator = Border.HORIZONTAL
+            formatted_text.extend(
+                [
+                    ("class:border.inner", Border.TOP_LEFT),
+                    ("class:border.inner", seperator),
+                    ("", " "),
+                ]
+            )
+            char_len += 3
+        else:
+            formatted_text.extend(
+                [
+                    ("class:border.inner", seperator),
+                    ("", " "),
+                ]
+            )
+            char_len += 2
         for item, handler in items:
             formatted_text.extend(
                 [
@@ -127,8 +137,22 @@ class Renderer:
             char_len += len(symbol) + 3
 
         menu_width = max(0, width - char_len)
-        formatted_text.append(("class:border.inner", "-" * menu_width))
+        formatted_text.append(("class:border.inner", seperator * menu_width))
         return to_formatted_text(formatted_text)
+
+    def _render_code_block(self, node, width):
+        menu = self._render_menu(
+            [("Copy", lambda x: None)],
+            width=width,
+            top=True,
+        )
+        content = self._render_highlighted_block(
+            content=node.text(),
+            language=node.options.language,
+        )
+        bottom = self._render_bottom_seperator(width=width)
+        seperator = to_formatted_text("\n\n")
+        return [menu, seperator, content, seperator, bottom]
 
     def _render_test_block(self, node, width=60):
         top = self._render_top_seperator(

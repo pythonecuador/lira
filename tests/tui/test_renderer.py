@@ -58,18 +58,18 @@ Python
 
 This is a Python test block:
 
-┌─ Write a comment ────────
+┌─ Write a comment ───────────────
 
-- [Edit] [Load] [Run] (•) -
+- [ Edit ] [ Load ] [ Run ] (•) --
 
   # Put your comment below
 
 
-└──────────────────────────"""
+└─────────────────────────────────"""
         expected = expected.lstrip()
         toc = self.chapters[1].toc()
         section = toc[0][0]
-        content = self.renderer.render(section, width=27)
+        content = self.renderer.render(section, width=34)
         assert self._to_text(content) == expected
 
     def test_test_block_no_language(self):
@@ -78,15 +78,15 @@ Plain text
 
 This is just plain text:
 
-┌─ Who is Guido? ──────────
+┌─ Who is Guido? ─────────────────
 
-- [Edit] [Load] [Run] (•) -
+- [ Edit ] [ Load ] [ Run ] (•) --
 
   He's the creator of something...
 
-└──────────────────────────"""
+└─────────────────────────────────"""
         expected = expected.lstrip()
         toc = self.chapters[1].toc()
         section = toc[1][0]
-        content = self.renderer.render(section, width=27)
+        content = self.renderer.render(section, width=34)
         assert self._to_text(content) == expected

@@ -1,13 +1,11 @@
 import logging
 from functools import partial
-from textwrap import dedent
 
 from prompt_toolkit.application import get_app
 from prompt_toolkit.buffer import Buffer
 from prompt_toolkit.data_structures import Point
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.formatted_text import (
-    HTML,
     fragment_list_to_text,
     split_lines,
     to_formatted_text,
@@ -438,7 +436,7 @@ class BooksList(LiraList):
     """List of :py:class:`lira.book.Book`."""
 
     def _get_title(self):
-        return HTML("<title>{}</title>").format("Books")
+        return to_formatted_text([("class:title", "Books")])
 
     def _get_elements(self):
         elements = []
@@ -466,30 +464,38 @@ class BooksList(LiraList):
         authors = ", ".join(book.metadata["authors"])
         published = book.metadata["published"]
         updated = book.metadata["updated"]
-        text = dedent(
-            """
-            <title>{title}</title>
+        formatted_text = [
+            ("class:text.title", title),
+            ("", "\n\n"),
+        ]
+        if description:
+            formatted_text.extend(
+                [
+                    ("class:text.description", description),
+                    ("", "\n\n"),
+                ]
+            )
 
-            <description>{description}</description>
-
-            <key>Authors</key><separator>:</separator> <value>{authors}</value>
-            <key>Language</key><separator>:</separator> <value>{language}</value>
-            <key>Published</key><separator>:</separator> <value>{published}</value>
-            """
-        ).strip()
-        if updated:
-            text += (
-                "\n<key>Updated</key><separator>:</separator> <value>{updated}</value>"
+        metadata = [
+            ("Authors", authors),
+            ("Language", language),
+            ("Published", published),
+            ("Updated", updated),
+        ]
+        for key, value in metadata:
+            if not value:
+                continue
+            formatted_text.extend(
+                [
+                    ("class:text.key", key),
+                    ("class:text.separator", ":"),
+                    ("", " "),
+                    ("class:text.value", value),
+                    ("", "\n"),
+                ]
             )
         text_area = FormattedTextArea(
-            text=HTML(text).format(
-                title=title,
-                description=description,
-                authors=authors,
-                language=language,
-                published=published,
-                updated=updated,
-            ),
+            text=to_formatted_text(formatted_text),
             focusable=True,
             scrollbar=True,
         )
@@ -506,7 +512,7 @@ class BookChaptersList(LiraList):
 
     def _get_title(self):
         book_title = self.book.metadata["title"]
-        return HTML("<title>{}</title>").format(book_title)
+        return to_formatted_text([("class:title", book_title)])
 
     def _get_bullet(self, line):
         return f"{line + 1}. "
@@ -549,10 +555,15 @@ class ChapterSectionsList(LiraList):
 
     def _get_title(self):
         book_title = self.chapter.book.metadata["title"]
-        title = HTML(
-            "<title>{}</title> <separator>></separator> <title>{}</title>"
-        ).format(book_title, self.chapter.title)
-        return title
+        return to_formatted_text(
+            [
+                ("class:title", book_title),
+                ("", " "),
+                ("class:seperator", ">"),
+                ("", " "),
+                ("class:title", self.chapter.title),
+            ]
+        )
 
     def _get_bullet(self, line):
         return f"{self.index + 1}.{line + 1}. "

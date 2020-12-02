@@ -1,4 +1,15 @@
-from collections import namedtuple
+from copy import copy
+
+
+def _get_options_proxy(options, **values):
+    class OptionsProxy:
+        __slots__ = options
+
+        def __init__(self, **kwargs):
+            for item, value in kwargs.items():
+                setattr(self, item, value)
+
+    return OptionsProxy(**values)
 
 
 class Node:
@@ -17,22 +28,24 @@ class Node:
     """If it's a terminal node (without children)"""
 
     valid_options = set()
-    """A set of valid options for this node"""
+    """A set of valid options for this node."""
 
     def __init__(self, *children, **options):
         self.content = None
         """Raw content of the node"""
 
         self.children = []
-        """List of children of this node"""
+        """List of children of this node."""
 
-        OptionsProxy = namedtuple("OptionsProxy", self.valid_options)
-        self.options = OptionsProxy(**options)
+        self.options = _get_options_proxy(self.valid_options, **options)
         """Named tuple with the options for this node"""
+
+        self._initial_options = copy(self.options)
 
         if self.is_terminal:
             if children:
                 self.content = children[0]
+                self._initial_content = copy(self.content)
         else:
             self.children = list(children)
 
@@ -42,6 +55,11 @@ class Node:
         if len(text) > max_len or len(split) > 1:
             text = text[:max_len] + "..."
         return text
+
+    def reset(self):
+        """Reset options and content of the node to their initial values."""
+        self.content = self._initial_content
+        self.options = self._initial_options
 
     def append(self, node):
         """Append a node as a child of this node."""
@@ -204,10 +222,11 @@ class TestBlock(Node):
     - description
     - state
     - language
+    - extension: used to open a new file when editing.
     """
 
     is_terminal = True
-    valid_options = {"validator", "description", "state", "language"}
+    valid_options = {"validator", "description", "state", "language", "extension"}
 
     def text(self):
         return "\n".join(self.content)

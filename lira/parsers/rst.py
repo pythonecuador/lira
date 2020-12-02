@@ -7,6 +7,7 @@ from docutils.utils import new_document
 
 from lira.parsers import BaseParser, State
 from lira.parsers import nodes as booknodes
+from lira.parsers.utils import guess_extension
 
 logger = logging.getLogger(__name__)
 
@@ -181,6 +182,7 @@ class RSTParser(BaseParser):
         validator = options["validator"]
         state = options.get("state", State.UNKNOWN)
         language = options.get("language")
+        extension = options.get("extension", guess_extension(language))
         content = list(attrs["content"])
         return booknodes.TestBlock(
             content,
@@ -188,6 +190,7 @@ class RSTParser(BaseParser):
             description=description,
             state=state,
             language=language,
+            extension=extension,
         )
 
     def _parse_section(self, node):

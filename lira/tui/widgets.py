@@ -128,8 +128,7 @@ class FormattedBufferControl(BufferControl):
                 if len(item) >= 3:
                     handler = item[2]
                     return handler(mouse_event)
-                else:
-                    break
+                break
         return response
 
 

@@ -3,7 +3,7 @@ from textwrap import dedent
 
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit.filters import Condition
-from prompt_toolkit.formatted_text import merge_formatted_text
+from prompt_toolkit.formatted_text import merge_formatted_text, to_formatted_text
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import (
@@ -67,6 +67,10 @@ class WindowContainer:
 
 
 class ContentArea(WindowContainer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.text_area = self._get_default_container()
+
     def get_container(self):
         if self.pages:
             return self._box(self.pages[-1])
@@ -91,23 +95,17 @@ class ContentArea(WindowContainer):
             Version: {__version__}
             """
         )
-        text_area = TextArea(
-            text=text.strip(),
-            focusable=False,
-            read_only=True,
+        text_area = FormattedTextArea(
+            to_formatted_text(text.strip()),
+            scrollbar=True,
+            focusable=True,
         )
         return text_area
 
     def render_section(self, section):
-        renderer = Renderer()
-        formatted_content = merge_formatted_text(renderer.render(section))
-        self.tui.content.reset(
-            FormattedTextArea(
-                formatted_content,
-                scrollbar=True,
-                focusable=True,
-            )
-        )
+        renderer = Renderer(tui=self.tui, section=section)
+        self.text_area.text = merge_formatted_text(renderer.render())
+        self.reset(self.text_area)
 
 
 class SidebarMenu(WindowContainer):

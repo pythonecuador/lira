@@ -54,6 +54,7 @@ class TestNodes:
             language="python",
             state=State.UNKNOWN,
             description="I'm a validator",
+            extension=".txt",
         )
         assert node.tagname == "TestBlock"
         assert node.options.validator == "lira.validators.Validator"
@@ -62,6 +63,29 @@ class TestNodes:
         assert node.options.state == State.UNKNOWN
         assert node.text() == "# Write a comment"
         assert str(node) == "<TestBlock lira.validators.Validator: I'm a validator>"
+
+    def test_block_node_reset(self):
+        node = nodes.TestBlock(
+            ["# Write a comment"],
+            validator="lira.validators.Validator",
+            language="python",
+            state=State.UNKNOWN,
+            description="I'm a validator",
+            extension=".txt",
+        )
+        node.options.language = "python"
+        node.options.state = State.VALID
+        node.options.description = "Please revert me!"
+        node.content = ["One", "Two"]
+
+        node.reset()
+
+        assert node.tagname == "TestBlock"
+        assert node.options.validator == "lira.validators.Validator"
+        assert node.options.language == "python"
+        assert node.options.description == "I'm a validator"
+        assert node.options.state == State.UNKNOWN
+        assert node.text() == "# Write a comment"
 
     @pytest.mark.parametrize(
         "type",

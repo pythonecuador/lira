@@ -18,7 +18,7 @@ from prompt_toolkit.widgets import Box, Label, TextArea
 from lira import __version__
 from lira.tui.render import Renderer
 from lira.tui.utils import exit_app, set_title
-from lira.tui.widgets import Button, FormattedTextArea
+from lira.tui.widgets import BooksList, Button, FormattedTextArea
 
 
 class WindowContainer:
@@ -28,7 +28,7 @@ class WindowContainer:
     def __init__(self, tui):
         self.tui = tui
         self.lira = self.tui.lira
-        self.pages = []
+        self.pages = [self._get_default_container()]
         self.container = DynamicContainer(self.get_container)
 
     def _get_default_container(self):
@@ -104,6 +104,15 @@ class ContentArea(WindowContainer):
 
     def render_section(self, section):
         renderer = Renderer(tui=self.tui, section=section)
+        self.text_area = FormattedTextArea(
+            merge_formatted_text(renderer.render()),
+            scrollbar=True,
+            focusable=True,
+        )
+        self.reset(self.text_area)
+
+    def update_section(self, section):
+        renderer = Renderer(tui=self.tui, section=section)
         self.text_area.text = merge_formatted_text(renderer.render())
         self.reset(self.text_area)
 
@@ -130,6 +139,9 @@ class SidebarMenu(WindowContainer):
             width=Dimension(min=1),
             key_bindings=self.get_key_bindings(),
         )
+
+    def _get_default_container(self):
+        return BooksList(tui=self.tui)
 
     def get_key_bindings(self):
         keys = KeyBindings()

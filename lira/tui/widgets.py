@@ -122,7 +122,7 @@ class FormattedBufferControl(BufferControl):
     def select(self, mouse_event):
         fragments = self.formatted_lines[mouse_event.position.y]
         # Find position in the fragment list.
-        xpos = mouse_event.position.x
+        xpos = mouse_event.position.x + 1
 
         # Find mouse handler for this character.
         count = 0
@@ -150,12 +150,13 @@ class FormattedTextArea:
         dont_extend_height=True,
         dont_extend_width=False,
         read_only=True,
+        initial_position=0,
     ):
         self.read_only = read_only
         formatted_text = to_formatted_text(text)
         plain_text = fragment_list_to_text(formatted_text)
         self.buffer = Buffer(
-            document=Document(plain_text, 0),
+            document=Document(plain_text, initial_position),
             read_only=Condition(lambda: self.read_only),
         )
         self.control = FormattedBufferControl(
@@ -201,7 +202,8 @@ class FormattedTextArea:
         formatted_text = to_formatted_text(text)
         self.control.update_formatted_text(formatted_text)
         plain_text = fragment_list_to_text(formatted_text)
-        self.document = Document(plain_text, 0)
+        current_position = min(self.document.cursor_position, len(plain_text))
+        self.document = Document(plain_text, current_position)
 
     def get_key_bindings(self):
         keys = KeyBindings()

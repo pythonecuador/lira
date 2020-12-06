@@ -8,7 +8,6 @@ from prompt_toolkit.layout.containers import HSplit, VSplit
 from lira.app import LiraApp
 from lira.tui.themes import style, theme
 from lira.tui.utils import exit_app, set_title
-from lira.tui.widgets import BooksList
 from lira.tui.windows import ContentArea, SidebarMenu, StatusBar
 
 
@@ -19,9 +18,7 @@ class TerminalUI:
 
         self.content = ContentArea(self)
         self.status = StatusBar(self)
-
         self.menu = SidebarMenu(self)
-        self.menu.reset(BooksList(self))
 
         self.container = HSplit(
             [

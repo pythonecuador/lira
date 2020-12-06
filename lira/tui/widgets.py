@@ -29,7 +29,7 @@ from prompt_toolkit.layout.processors import (
     Processor,
     Transformation,
 )
-from prompt_toolkit.mouse_events import MouseEventType
+from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 from prompt_toolkit.widgets import Box
 from prompt_toolkit.widgets import Button as ToolkitButton
 
@@ -116,6 +116,10 @@ class FormattedBufferControl(BufferControl):
         if mouse_event.position.y >= len(self.formatted_lines):
             return response
 
+        self.select(mouse_event)
+        return response
+
+    def select(self, mouse_event):
         fragments = self.formatted_lines[mouse_event.position.y]
         # Find position in the fragment list.
         xpos = mouse_event.position.x
@@ -129,7 +133,6 @@ class FormattedBufferControl(BufferControl):
                     handler = item[2]
                     return handler(mouse_event)
                 break
-        return response
 
 
 class FormattedTextArea:
@@ -159,6 +162,7 @@ class FormattedTextArea:
             buffer=self.buffer,
             formatted_text=formatted_text,
             input_processors=[FormatTextProcessor(), HighlightSelectionProcessor()],
+            key_bindings=self.get_key_bindings(),
             include_default_input_processors=False,
             focusable=focusable,
             focus_on_click=focusable,
@@ -198,6 +202,19 @@ class FormattedTextArea:
         self.control.update_formatted_text(formatted_text)
         plain_text = fragment_list_to_text(formatted_text)
         self.document = Document(plain_text, 0)
+
+    def get_key_bindings(self):
+        keys = KeyBindings()
+
+        @keys.add(" ")
+        @keys.add(Keys.Enter)
+        def _(event):
+            row = self.document.cursor_position_row
+            col = self.document.cursor_position_col
+            mouse_event = MouseEvent(Point(col, row), MouseEventType.MOUSE_UP)
+            self.control.select(mouse_event)
+
+        return keys
 
     def __pt_container__(self):
         return self.window

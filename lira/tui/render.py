@@ -189,12 +189,12 @@ class Renderer:
     def _reset_action(self, node, mouse_event):
         if mouse_event.event_type == MouseEventType.MOUSE_UP:
             node.reset()
-            self.tui.content.render_section(self.section)
+            self.tui.content.update_section(self.section)
 
     def _edit_action(self, node, mouse_event):
         if mouse_event.event_type == MouseEventType.MOUSE_UP:
             self._open_editor(node)
-            self.tui.content.render_section(self.section)
+            self.tui.content.update_section(self.section)
 
     def _open_editor(self, node):
         """

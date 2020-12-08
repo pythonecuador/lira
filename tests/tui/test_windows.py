@@ -4,6 +4,7 @@ import pytest
 from prompt_toolkit.layout.containers import to_container
 from prompt_toolkit.widgets import Button, Label
 
+from lira.tui.widgets import BooksList
 from lira.tui.windows import SidebarMenu, StatusBar
 
 from .utils import to_widget
@@ -15,15 +16,15 @@ class TestSidebarMenu:
         self.window = SidebarMenu(tui=tui)
 
     def test_default_menu(self):
-        """The default menu has 2 buttons and a label."""
+        """The default menu has 2 buttons and a BooksList."""
         children = to_container(self.window).get_children()
         assert len(children) == 3
 
-        empty_label = children[0].get_container().content
+        books_list = children[0].get_container()
         back_button = children[1]
         exit_button = to_widget(children[2])
 
-        assert empty_label.text() == "Empty container"
+        assert isinstance(books_list, BooksList)
 
         # Back button is not visible
         assert to_widget(back_button.content).text == "Back"
@@ -38,7 +39,7 @@ class TestSidebarMenu:
         first_label = Label("First")
         second_label = Label("Second")
 
-        self.window.push(first_label)
+        self.window.reset(first_label)
         self.window.push(second_label)
 
         children = to_container(self.window).get_children()
@@ -65,7 +66,7 @@ class TestSidebarMenu:
 
     def test_pop_all_pages(self):
         first_label = Label("First")
-        self.window.push(first_label)
+        self.window.reset(first_label)
         assert len(self.window.pages) == 1
 
         # We can't pop the last page.
@@ -81,8 +82,8 @@ class TestSidebarMenu:
         self.window.reset()
         assert len(self.window.pages) == 1
         children = to_container(self.window).get_children()
-        label = children[0].get_container()
-        assert label.content.text() == "Empty container"
+        books_list = children[0].get_container()
+        assert isinstance(books_list, BooksList)
 
 
 class TestStatusBar:

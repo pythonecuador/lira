@@ -11,7 +11,6 @@ from prompt_toolkit.formatted_text import (
     to_formatted_text,
 )
 from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout import (
     BufferControl,
@@ -389,23 +388,9 @@ class List:
         def _(event):
             self.previous()
 
-        @keys.add(Keys.BackTab)
-        def _(event):
-            if self.index <= 0:
-                focus_previous(event)
-            else:
-                self.previous()
-
         @keys.add(Keys.Down)
         def _(event):
             self.next()
-
-        @keys.add(Keys.Tab)
-        def _(event):
-            if self.index >= len(self.elements) - 1:
-                focus_next(event)
-            else:
-                self.next()
 
         @keys.add(" ")
         @keys.add(Keys.Enter)

@@ -9,7 +9,7 @@ from prompt_toolkit.mouse_events import MouseEventType
 from prompt_toolkit.widgets.base import Border
 
 from lira.parsers import State
-from lira.tui.utils import get_lexer
+from lira.tui.utils import copy_to_clipboard, get_lexer, notify_after_copy
 
 log = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ class Renderer:
 
     def _render_code_block(self, node):
         menu = self._render_menu(
-            [("Copy", lambda x: None)],
+            [("Copy", partial(self._copy_action, node))],
             top=True,
         )
         content = self._render_highlighted_block(
@@ -185,6 +185,12 @@ class Renderer:
         bottom = self._render_bottom_seperator()
         seperator = to_formatted_text("\n\n")
         return [top, seperator, menu, seperator, content, seperator, bottom]
+
+    def _copy_action(self, node, mouse_event):
+        text = node.text()
+        if text:
+            copy_to_clipboard(text)
+            notify_after_copy(self.tui, text)
 
     def _reset_action(self, node, mouse_event):
         if mouse_event.event_type == MouseEventType.MOUSE_UP:

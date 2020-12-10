@@ -21,6 +21,7 @@ setuptools.setup(
         "PyYAML==5.3.1",
         "prompt-toolkit==3.0.7",
         "Pygments==2.7.2",
+        "pyperclip==1.8.1",
         "click==7.1.2",
     ],
     entry_points={

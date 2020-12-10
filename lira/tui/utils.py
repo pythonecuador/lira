@@ -22,3 +22,16 @@ def get_lexer(language):
         return get_lexer_by_name(language.strip().lower())
     except ClassNotFound:
         return None
+
+
+def copy_to_clipboard(text):
+    get_app().clipboard.set_text(text)
+
+
+def notify_after_copy(tui, text):
+    lines = len(text.split("\n"))
+    if lines <= 1:
+        msg = "One line copied!"
+    else:
+        msg = f"{lines} lines copied!"
+    tui.status.notify(msg)

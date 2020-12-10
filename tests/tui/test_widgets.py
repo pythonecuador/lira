@@ -2,6 +2,7 @@ from pathlib import Path
 from textwrap import dedent
 from unittest import mock
 
+from prompt_toolkit.clipboard import ClipboardData
 from prompt_toolkit.data_structures import Point
 from prompt_toolkit.formatted_text import HTML, to_formatted_text
 from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
@@ -124,6 +125,53 @@ class TestFormattedTextArea:
         text_area = FormattedTextArea(formatted_text)
         text_area.control.mouse_handler(mouse_event)
         handler.assert_not_called()
+
+    @mock.patch("lira.tui.utils.get_app")
+    def test_copy_selection(self, get_app):
+        text = to_formatted_text("I'm a text area")
+        text_area = FormattedTextArea(text)
+
+        mock_copy_selection = mock.MagicMock()
+        text = "Hello!"
+        data = ClipboardData(text=text)
+        mock_copy_selection.return_value = data
+        text_area.buffer.copy_selection = mock_copy_selection
+
+        text_area.copy_selection()
+        get_app().clipboard.set_text.assert_called_once_with(text)
+
+    @mock.patch("lira.tui.utils.get_app")
+    def test_copy_empty_selection(self, get_app):
+        text = to_formatted_text("I'm a text area")
+        text_area = FormattedTextArea(text)
+
+        mock_copy_selection = mock.MagicMock()
+        text = ""
+        data = ClipboardData(text=text)
+        mock_copy_selection.return_value = data
+        text_area.buffer.copy_selection = mock_copy_selection
+
+        text_area.copy_selection()
+        get_app().clipboard.set_text.assert_not_called()
+
+    @mock.patch("lira.tui.utils.get_app")
+    def test_copy_selection_callback(self, get_app):
+        callback = mock.MagicMock()
+        text = to_formatted_text("I'm a text area")
+        text_area = FormattedTextArea(
+            text=text,
+            after_copy=callback,
+        )
+
+        mock_copy_selection = mock.MagicMock()
+        text = "Hi"
+        data = ClipboardData(text=text)
+        mock_copy_selection.return_value = data
+        text_area.buffer.copy_selection = mock_copy_selection
+
+        text_area.copy_selection()
+        get_app().clipboard.set_text.assert_called_once_with(text)
+        callback.assert_called_once_with(text)
 
 
 class TestList:

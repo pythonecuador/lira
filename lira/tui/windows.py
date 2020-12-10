@@ -1,4 +1,5 @@
 import asyncio
+from functools import partial
 from textwrap import dedent
 
 from prompt_toolkit.application.current import get_app
@@ -17,7 +18,7 @@ from prompt_toolkit.widgets import Box, Label, TextArea
 
 from lira import __version__
 from lira.tui.render import Renderer
-from lira.tui.utils import exit_app, set_title
+from lira.tui.utils import exit_app, notify_after_copy, set_title
 from lira.tui.widgets import BooksList, Button, FormattedTextArea
 
 
@@ -89,16 +90,19 @@ class ContentArea(WindowContainer):
             f"""
             Welcome to Lira!
 
-            - Press <Ctrl-c> or <Ctrl-q> to exit.
-            - Navigate with <Tab> and the arrow keys.
+            - Press <Ctrl-q> to exit.
+            - Change of window with <Tab>.
+            - Move inside a widget with the arrow keys.
+            - Copy a selection with <Ctrl-c>.
 
-            Version: {__version__}
+            Version: {__version__}.
             """
         )
         text_area = FormattedTextArea(
             to_formatted_text(text.strip()),
             scrollbar=True,
             focusable=True,
+            after_copy=partial(notify_after_copy, self.tui),
         )
         return text_area
 
@@ -108,6 +112,7 @@ class ContentArea(WindowContainer):
             merge_formatted_text(renderer.render()),
             scrollbar=True,
             focusable=True,
+            after_copy=partial(notify_after_copy, self.tui),
         )
         self.reset(self.text_area)
 

@@ -1,4 +1,5 @@
 from prompt_toolkit.application import Application
+from prompt_toolkit.clipboard.pyperclip import PyperclipClipboard
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.key_binding.bindings.focus import focus_next, focus_previous
 from prompt_toolkit.keys import Keys
@@ -44,6 +45,7 @@ class TerminalUI:
             full_screen=True,
             style=style,
             after_render=self._ready,
+            clipboard=PyperclipClipboard(),
         )
 
     def get_key_bindings(self):
@@ -57,7 +59,6 @@ class TerminalUI:
         def _(event):
             focus_previous(event)
 
-        @keys.add(Keys.ControlC)
         @keys.add(Keys.ControlQ)
         def _(event):
             exit_app()

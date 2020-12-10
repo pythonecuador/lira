@@ -32,7 +32,7 @@ from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 from prompt_toolkit.widgets import Box
 from prompt_toolkit.widgets import Button as ToolkitButton
 
-from lira.tui.utils import set_title
+from lira.tui.utils import copy_to_clipboard, notify_after_copy, set_title
 
 log = logging.getLogger(__name__)
 
@@ -150,8 +150,10 @@ class FormattedTextArea:
         dont_extend_width=False,
         read_only=True,
         initial_position=0,
+        after_copy=None,
     ):
         self.read_only = read_only
+        self.after_copy = after_copy
         formatted_text = to_formatted_text(text)
         plain_text = fragment_list_to_text(formatted_text)
         self.buffer = Buffer(
@@ -204,8 +206,20 @@ class FormattedTextArea:
         current_position = min(self.document.cursor_position, len(plain_text))
         self.document = Document(plain_text, current_position)
 
+    def copy_selection(self):
+        data = self.buffer.copy_selection()
+        text = data.text
+        if text:
+            copy_to_clipboard(text)
+            if self.after_copy:
+                self.after_copy(text)
+
     def get_key_bindings(self):
         keys = KeyBindings()
+
+        @keys.add(Keys.ControlC)
+        def _(event):
+            self.copy_selection()
 
         @keys.add(" ")
         @keys.add(Keys.Enter)
@@ -501,6 +515,7 @@ class BooksList(LiraList):
             text=to_formatted_text(formatted_text),
             focusable=True,
             scrollbar=True,
+            after_copy=partial(notify_after_copy, self.tui),
         )
         self.tui.content.reset(text_area)
 

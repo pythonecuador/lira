@@ -591,7 +591,7 @@ class ChapterSectionsList(LiraList):
         for section, _ in self.toc:
             elements.append(
                 ListElement(
-                    text=section.options.title,
+                    text=section.attributes.title,
                     on_select=partial(self._select, section),
                 )
             )

@@ -60,7 +60,7 @@ class TestBookChapter:
         else:
             section = toc[0]
             content = toc[1]
-            assert section.options.title == expected_toc[0]
+            assert section.attributes.title == expected_toc[0]
             self.assert_toc(content, expected_toc[1])
 
     def test_chapter_metadata(self):

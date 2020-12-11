@@ -1,15 +1,15 @@
 from copy import copy
 
 
-def _get_options_proxy(options, **values):
-    class OptionsProxy:
-        __slots__ = options
+def _get_attributes_proxy(attributes, **values):
+    class AttributesProxy:
+        __slots__ = attributes
 
         def __init__(self, **kwargs):
             for item, value in kwargs.items():
                 setattr(self, item, value)
 
-    return OptionsProxy(**values)
+    return AttributesProxy(**values)
 
 
 class Node:
@@ -17,37 +17,44 @@ class Node:
     """
     Base class for a node.
 
-    If it's a terminal node, the first argument is the text of this node,
-    otherwise the arguments are the children of this node.
+    :param content: Content for this node (usually only for terminal nodes).
+    :param children: List of children.
+    :param attributes: Dictionary of valid attributes.
 
-    All kwarg arguments are the options of this node
-    (only options from `valid_options` are recognized).
+    If it's a terminal node, it doesn't have children.
+    Only attributes from `valid_attributes` are recognized.
     """
 
     is_terminal = False
     """If it's a terminal node (without children)"""
 
-    valid_options = set()
-    """A set of valid options for this node."""
+    valid_attributes = set()
+    """A set of valid attributes for this node."""
 
-    def __init__(self, *children, **options):
-        self.content = None
+    def __init__(self, content=None, *, children=None, attributes=None):
+        if self.is_terminal and children:
+            raise ValueError("A terminal node can't have children")
+        if not self.is_terminal and content:
+            raise ValueError("A no terminal node can't have content")
+
+        self.content = content
         """Raw content of the node"""
 
-        self.children = []
+        self.children = children or []
         """List of children of this node."""
 
-        self.options = _get_options_proxy(self.valid_options, **options)
-        """Named tuple with the options for this node"""
+        attributes = attributes or {}
+        self.attributes = _get_attributes_proxy(self.valid_attributes, **attributes)
+        """Named tuple with the attributes for this node"""
 
-        self._initial_options = copy(self.options)
+        self.parent = None
+        """Parent node"""
 
-        if self.is_terminal:
-            if children:
-                self.content = children[0]
-                self._initial_content = copy(self.content)
-        else:
-            self.children = list(children)
+        for child in self.children:
+            child.parent = self
+
+        self._initial_attributes = copy(self.attributes)
+        self._initial_content = copy(self.content)
 
     def _trim_text(self, text, max_len=30):
         split = text.split("\n")
@@ -57,21 +64,9 @@ class Node:
         return text
 
     def reset(self):
-        """Reset options and content of the node to their initial values."""
+        """Reset attributes and content of the node to their initial values."""
         self.content = self._initial_content
-        self.options = self._initial_options
-
-    def append(self, node):
-        """Append a node as a child of this node."""
-        if self.is_terminal:
-            raise ValueError
-        self.children.append(node)
-
-    def extend(self, nodes):
-        """Append a list of nodes as a children of this node."""
-        if self.is_terminal:
-            raise ValueError
-        self.children.extend(nodes)
+        self.attributes = self._initial_attributes
 
     def text(self):
         """Text representation of the node."""
@@ -146,7 +141,7 @@ class Section(NestedNode):
     """
     Section representation.
 
-    Options:
+    Attributes:
 
     - title
 
@@ -158,10 +153,10 @@ class Section(NestedNode):
     - :py:class:`Admonition`
     """
 
-    valid_options = {"title"}
+    valid_attributes = {"title"}
 
     def __repr__(self):
-        title = self.options.title
+        title = self.attributes.title
         return f"<{self.tagname} {title}: {self.children}>"
 
 
@@ -170,7 +165,7 @@ class Admonition(NestedNode):
     """
     Text inside a box, usually to give a warning or a note to the user.
 
-    Options:
+    Attributes:
 
     - title: The title of the admonition, defaults to ``type``.
     - type: one of ``note``, ``warning``, or ``tip``.
@@ -180,10 +175,10 @@ class Admonition(NestedNode):
     - :py:class:`Paragraph`
     """
 
-    valid_options = {"title", "type"}
+    valid_attributes = {"title", "type"}
 
     def __repr__(self):
-        title = self.options.title
+        title = self.attributes.title
         return f"<{self.tagname} {title}: {self.children}>"
 
 
@@ -194,19 +189,19 @@ class CodeBlock(Node):
 
     The content of this node should be a list of lines.
 
-    Options:
+    Attributes:
 
     - language
     """
 
     is_terminal = True
-    valid_options = {"language"}
+    valid_attributes = {"language"}
 
     def text(self):
         return "\n".join(self.content)
 
     def __repr__(self):
-        lang = self.options.language
+        lang = self.attributes.language
         code = self._trim_text(self.text())
         return f"<{self.tagname} {lang}: {code}>"
 
@@ -216,7 +211,7 @@ class TestBlock(Node):
     """
     Challenge/response block to interact with the user.
 
-    Options:
+    Attributes:
 
     - validator: dotted path to a :py:class:`lira.validator.Validator` class.
     - description
@@ -226,14 +221,14 @@ class TestBlock(Node):
     """
 
     is_terminal = True
-    valid_options = {"validator", "description", "state", "language", "extension"}
+    valid_attributes = {"validator", "description", "state", "language", "extension"}
 
     def text(self):
         return "\n".join(self.content)
 
     def __repr__(self):
-        description = self.options.description
-        validator = self.options.validator
+        description = self.attributes.description
+        validator = self.attributes.validator
         return f"<{self.tagname} {validator}: {description}>"
 
 

@@ -32,7 +32,7 @@ class TestRSTParser:
 
         section = content[0]
         assert section.tagname == "Section"
-        assert section.options.title == "Comments"
+        assert section.attributes.title == "Comments"
         assert len(section.children) == 4
 
     def test_parse_paragraph(self):
@@ -74,7 +74,7 @@ class TestRSTParser:
         codeblock = content[0].children[1]
 
         assert codeblock.tagname == "CodeBlock"
-        assert codeblock.options.language == "python"
+        assert codeblock.attributes.language == "python"
         assert codeblock.content == [
             "# This is a comment",
             "spam = 1  # and this is another one!",
@@ -85,17 +85,17 @@ class TestRSTParser:
         testblock = content[0].children[2]
 
         assert testblock.tagname == "TestBlock"
-        assert testblock.options.description == "Write a comment"
-        assert testblock.options.language is None
+        assert testblock.attributes.description == "Write a comment"
+        assert testblock.attributes.language is None
         assert testblock.text() == ""
-        assert testblock.options.validator == "lira.validators.Validator"
+        assert testblock.attributes.validator == "lira.validators.Validator"
 
         testblock = content[0].children[3]
         assert testblock.tagname == "TestBlock"
-        assert testblock.options.description == "Write another comment"
-        assert testblock.options.language == "python"
+        assert testblock.attributes.description == "Write another comment"
+        assert testblock.attributes.language == "python"
         assert testblock.text() == "# I'm a comment"
-        assert testblock.options.validator == "lira.validators.Validator"
+        assert testblock.attributes.validator == "lira.validators.Validator"
 
     def test_parse_invalid_node(self):
         logger = logging.getLogger("lira.parsers.rst")

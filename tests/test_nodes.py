@@ -29,19 +29,24 @@ class TestNodes:
         assert str(node) == '<Literal: "hello">'
 
     def test_paragraph_node(self):
-        node = nodes.Paragraph(nodes.Text("Hello "), nodes.Strong("world!"))
+        node = nodes.Paragraph(children=[nodes.Text("Hello "), nodes.Strong("world!")])
         assert node.tagname == "Paragraph"
         assert node.text() == "Hello world!"
         assert str(node) == '<Paragraph: [<Text: "Hello ">, <Strong: "world!">]>'
 
+        for child in node.children:
+            assert child.parent is node
+
     def test_code_block_node(self):
         node = nodes.CodeBlock(
-            [
+            content=[
                 "import os",
                 "",
                 "print('Hello world')",
             ],
-            language="python",
+            attributes=dict(
+                language="python",
+            ),
         )
         assert node.tagname == "CodeBlock"
         assert node.text() == "import os\n\nprint('Hello world')"
@@ -49,42 +54,46 @@ class TestNodes:
 
     def test_test_block_node(self):
         node = nodes.TestBlock(
-            ["# Write a comment"],
-            validator="lira.validators.Validator",
-            language="python",
-            state=State.UNKNOWN,
-            description="I'm a validator",
-            extension=".txt",
+            content=["# Write a comment"],
+            attributes=dict(
+                validator="lira.validators.Validator",
+                language="python",
+                state=State.UNKNOWN,
+                description="I'm a validator",
+                extension=".txt",
+            ),
         )
         assert node.tagname == "TestBlock"
-        assert node.options.validator == "lira.validators.Validator"
-        assert node.options.language == "python"
-        assert node.options.description == "I'm a validator"
-        assert node.options.state == State.UNKNOWN
+        assert node.attributes.validator == "lira.validators.Validator"
+        assert node.attributes.language == "python"
+        assert node.attributes.description == "I'm a validator"
+        assert node.attributes.state == State.UNKNOWN
         assert node.text() == "# Write a comment"
         assert str(node) == "<TestBlock lira.validators.Validator: I'm a validator>"
 
     def test_block_node_reset(self):
         node = nodes.TestBlock(
-            ["# Write a comment"],
-            validator="lira.validators.Validator",
-            language="python",
-            state=State.UNKNOWN,
-            description="I'm a validator",
-            extension=".txt",
+            content=["# Write a comment"],
+            attributes=dict(
+                validator="lira.validators.Validator",
+                language="python",
+                state=State.UNKNOWN,
+                description="I'm a validator",
+                extension=".txt",
+            ),
         )
-        node.options.language = "python"
-        node.options.state = State.VALID
-        node.options.description = "Please revert me!"
+        node.attributes.language = "python"
+        node.attributes.state = State.VALID
+        node.attributes.description = "Please revert me!"
         node.content = ["One", "Two"]
 
         node.reset()
 
         assert node.tagname == "TestBlock"
-        assert node.options.validator == "lira.validators.Validator"
-        assert node.options.language == "python"
-        assert node.options.description == "I'm a validator"
-        assert node.options.state == State.UNKNOWN
+        assert node.attributes.validator == "lira.validators.Validator"
+        assert node.attributes.language == "python"
+        assert node.attributes.description == "I'm a validator"
+        assert node.attributes.state == State.UNKNOWN
         assert node.text() == "# Write a comment"
 
     @pytest.mark.parametrize(
@@ -92,15 +101,19 @@ class TestNodes:
         ["note", "warning", "tip"],
     )
     def test_admonition_node(self, type):
-        paragraph = nodes.Paragraph(nodes.Text("Hello "), nodes.Strong("world!"))
+        paragraph = nodes.Paragraph(
+            children=[nodes.Text("Hello "), nodes.Strong("world!")]
+        )
         node = nodes.Admonition(
-            paragraph,
-            title="Hey!",
-            type=type,
+            children=[paragraph],
+            attributes=dict(
+                title="Hey!",
+                type=type,
+            ),
         )
         assert node.tagname == "Admonition"
-        assert node.options.title == "Hey!"
-        assert node.options.type == type
+        assert node.attributes.title == "Hey!"
+        assert node.attributes.type == type
         assert node.text() == "Hello world!"
         repr = (
             '<Admonition Hey!: [<Paragraph: [<Text: "Hello ">, <Strong: "world!">]>]>'
@@ -108,15 +121,19 @@ class TestNodes:
         assert str(node) == repr
 
     def test_section_node(self):
-        paragraph = nodes.Paragraph(nodes.Text("Hello "), nodes.Strong("world!"))
-        paragraph2 = nodes.Paragraph(nodes.Text("Hello again"))
+        paragraph = nodes.Paragraph(
+            children=[nodes.Text("Hello "), nodes.Strong("world!")]
+        )
+        paragraph2 = nodes.Paragraph(children=[nodes.Text("Hello again")])
         node = nodes.Section(
-            paragraph,
-            paragraph2,
-            title="I'm a section",
+            children=[
+                paragraph,
+                paragraph2,
+            ],
+            attributes=dict(title="I'm a section"),
         )
         assert node.tagname == "Section"
-        assert node.options.title == "I'm a section"
+        assert node.attributes.title == "I'm a section"
         assert node.text() == "Hello world!\n\nHello again"
         repr = (
             "<Section I'm a section: "
@@ -124,3 +141,6 @@ class TestNodes:
             '<Paragraph: [<Text: "Hello again">]>]>'
         )
         assert str(node) == repr
+
+        for child in node.children:
+            assert child.parent is node

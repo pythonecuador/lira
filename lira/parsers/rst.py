@@ -159,9 +159,13 @@ class RSTParser(BaseParser):
                 elif directive_name == "code-block":
                     nodes.append(self._parse_code_block(child))
             elif tag in self.terminal_nodes:
-                nodes.append(self.terminal_nodes[tag](child.astext()))
+                terminal_node = self.terminal_nodes[tag](content=child.astext())
+                nodes.append(terminal_node)
             elif tag in self.container_nodes:
-                nodes.append(self.container_nodes[tag](*self._parse_content(child)))
+                container_node = self.container_nodes[tag](
+                    children=self._parse_content(child)
+                )
+                nodes.append(container_node)
             else:
                 logger.warning("Node with tag %(tag)s is not supported", {"tag": tag})
         return nodes
@@ -170,9 +174,12 @@ class RSTParser(BaseParser):
         attrs = node.attributes
         language = attrs["arguments"][0]
         code = list(attrs["content"])
+
         return booknodes.CodeBlock(
-            code,
-            language=language,
+            content=code,
+            attributes=dict(
+                language=language,
+            ),
         )
 
     def _parse_test_block(self, node):
@@ -184,18 +191,24 @@ class RSTParser(BaseParser):
         language = options.get("language")
         extension = options.get("extension", guess_extension(language))
         content = list(attrs["content"])
+
         return booknodes.TestBlock(
-            content,
-            validator=validator,
-            description=description,
-            state=state,
-            language=language,
-            extension=extension,
+            content=content,
+            attributes=dict(
+                validator=validator,
+                description=description,
+                state=state,
+                language=language,
+                extension=extension,
+            ),
         )
 
     def _parse_section(self, node):
         title = node.children[0].astext()
+
         return booknodes.Section(
-            *self._parse_content(node, start=1),
-            title=title,
+            children=self._parse_content(node, start=1),
+            attributes=dict(
+                title=title,
+            ),
         )

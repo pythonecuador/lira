@@ -42,7 +42,7 @@ class Renderer:
             tag = child.tagname
             if tag == "Section":
                 content.append(
-                    to_formatted_text(child.options.title, "class:text.title")
+                    to_formatted_text(child.attributes.title, "class:text.title")
                 )
                 content.extend(self._render(child.children))
             elif tag == "Paragraph":
@@ -160,7 +160,7 @@ class Renderer:
         )
         content = self._render_highlighted_block(
             content=node.text(),
-            language=node.options.language,
+            language=node.attributes.language,
         )
         bottom = self._render_bottom_seperator()
         seperator = to_formatted_text("\n\n")
@@ -168,7 +168,7 @@ class Renderer:
 
     def _render_test_block(self, node):
         top = self._render_top_seperator(
-            title=node.options.description,
+            title=node.attributes.description,
         )
         menu = self._render_menu(
             [
@@ -176,11 +176,11 @@ class Renderer:
                 ("Reset", partial(self._reset_action, node)),
                 ("Check", lambda x: None),
             ],
-            state=node.options.state,
+            state=node.attributes.state,
         )
         content = self._render_highlighted_block(
             content=node.text(),
-            language=node.options.language,
+            language=node.attributes.language,
         )
         bottom = self._render_bottom_seperator()
         seperator = to_formatted_text("\n\n")
@@ -213,7 +213,7 @@ class Renderer:
            Users can trigger a refresh with ctrl+l.
         """
         try:
-            extension = node.options.extension
+            extension = node.attributes.extension
             text = click.edit(text=node.text(), extension=extension)
             if text is not None:
                 node.content = text.split("\n")

@@ -34,5 +34,6 @@ Contents
    :maxdepth: 2
 
    config.rst
+   install.rst
    development.rst
    modules/index.rst

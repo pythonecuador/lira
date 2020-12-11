@@ -33,7 +33,7 @@ Contents
 .. toctree::
    :maxdepth: 2
 
+   installation.rst
    config.rst
-   install.rst
    development.rst
    modules/index.rst

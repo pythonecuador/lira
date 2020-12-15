@@ -16,10 +16,10 @@ A comment may appear at the **start of the line or following whitespace or code*
 .. Ignore me, I'm a comment
 
 .. test-block:: Write a comment
-   :validator: lira.validators.Validator
+   :validator: lira.validators.TestBlockValidator
 
 .. test-block:: Write another comment
-   :validator: lira.validators.Validator
+   :validator: lira.validators.TestBlockValidator
    :language: python
 
    # I'm a comment

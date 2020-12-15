@@ -30,7 +30,9 @@ jobs:
     - name: Run linter
       run: nox -s lint
     - name: Run tests
-      run: nox -s tests coverage
+      run: nox -s tests
+    - name: Coverage
+      run: nox -s coverage
     - name: codecov
       if: ${{ matrix.python-version == 3.9 }}
       run: |

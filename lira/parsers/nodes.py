@@ -1,5 +1,7 @@
 from copy import copy
 
+from lira.validators import get_validator
+
 
 def _get_attributes_proxy(attributes, **values):
     class AttributesProxy:
@@ -65,8 +67,8 @@ class Node:
 
     def reset(self):
         """Reset attributes and content of the node to their initial values."""
-        self.content = self._initial_content
-        self.attributes = self._initial_attributes
+        self.content = copy(self._initial_content)
+        self.attributes = copy(self._initial_attributes)
 
     def text(self):
         """Text representation of the node."""
@@ -223,8 +225,21 @@ class TestBlock(Node):
     is_terminal = True
     valid_attributes = {"validator", "description", "state", "language", "extension"}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._validator_class = get_validator(self.attributes.validator)
+        self._validator = self._validator_class(node=self)
+
     def text(self):
         return "\n".join(self.content)
+
+    def reset(self):
+        super().reset()
+        self._validator = self._validator_class(node=self)
+
+    def validate(self):
+        self._validator.run()
+        return self._validator
 
     def __repr__(self):
         description = self.attributes.description

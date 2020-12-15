@@ -56,7 +56,7 @@ class TestNodes:
         node = nodes.TestBlock(
             content=["# Write a comment"],
             attributes=dict(
-                validator="lira.validators.Validator",
+                validator="lira.validators.TestBlockValidator",
                 language="python",
                 state=State.UNKNOWN,
                 description="I'm a validator",
@@ -64,18 +64,18 @@ class TestNodes:
             ),
         )
         assert node.tagname == "TestBlock"
-        assert node.attributes.validator == "lira.validators.Validator"
+        assert node.attributes.validator == "lira.validators.TestBlockValidator"
         assert node.attributes.language == "python"
         assert node.attributes.description == "I'm a validator"
         assert node.attributes.state == State.UNKNOWN
         assert node.text() == "# Write a comment"
-        assert str(node) == "<TestBlock lira.validators.Validator: I'm a validator>"
+        assert str(node) == "<TestBlock lira.validators.TestBlockValidator: I'm a validator>"
 
     def test_block_node_reset(self):
         node = nodes.TestBlock(
             content=["# Write a comment"],
             attributes=dict(
-                validator="lira.validators.Validator",
+                validator="lira.validators.TestBlockValidator",
                 language="python",
                 state=State.UNKNOWN,
                 description="I'm a validator",
@@ -90,7 +90,7 @@ class TestNodes:
         node.reset()
 
         assert node.tagname == "TestBlock"
-        assert node.attributes.validator == "lira.validators.Validator"
+        assert node.attributes.validator == "lira.validators.TestBlockValidator"
         assert node.attributes.language == "python"
         assert node.attributes.description == "I'm a validator"
         assert node.attributes.state == State.UNKNOWN

@@ -25,20 +25,20 @@ This is a ``JavaScript`` code block:
 Test blocks
 -----------
 
-.. test-block:: This is a test block
-   :validator: lira.validators.Validator
+.. test-block:: Write your guess
+   :validator: lira.books.intro.LiraValidator
 
-   Write your guess here.
+   L... is awesome!
 
 .. test-block:: Invalid answer
-   :validator: lira.validators.Validator
+   :validator: lira.validators.TestBlockValidator
    :state: invalid
 
    This is how a test block looks like 
    if you don't answer correctly :(
 
 .. test-block:: Valid answer
-   :validator: lira.validators.Validator
+   :validator: lira.validators.TestBlockValidator
    :language: python
    :state: valid
 

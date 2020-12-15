@@ -88,14 +88,14 @@ class TestRSTParser:
         assert testblock.attributes.description == "Write a comment"
         assert testblock.attributes.language is None
         assert testblock.text() == ""
-        assert testblock.attributes.validator == "lira.validators.Validator"
+        assert testblock.attributes.validator == "lira.validators.TestBlockValidator"
 
         testblock = content[0].children[3]
         assert testblock.tagname == "TestBlock"
         assert testblock.attributes.description == "Write another comment"
         assert testblock.attributes.language == "python"
         assert testblock.text() == "# I'm a comment"
-        assert testblock.attributes.validator == "lira.validators.Validator"
+        assert testblock.attributes.validator == "lira.validators.TestBlockValidator"
 
     def test_parse_invalid_node(self):
         logger = logging.getLogger("lira.parsers.rst")

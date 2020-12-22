@@ -16,10 +16,10 @@ class LiraApp:
     Lira application.
 
     This class is used to interact with Lira.
-    Before using this class you'll need to call to :py:method:`setup`.
+    Before using this class you'll need to call to :py:meth:`setup`.
 
     If you want to refresh the options with the latest configuration,
-    call to :py:method:`load_config`.
+    call to :py:meth:`load_config`.
     """
 
     default_config = {

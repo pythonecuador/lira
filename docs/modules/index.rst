@@ -7,3 +7,4 @@ Modules
 
    /modules/book.rst
    /modules/parser.rst
+   /modules/validators.rst

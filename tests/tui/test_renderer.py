@@ -147,3 +147,9 @@ This is just plain text:
             extension=".txt",
         )
         assert node.text() == text
+
+    def test_test_block_reset_action(self):
+        pass
+
+    def test_test_block_check_action(self):
+        pass

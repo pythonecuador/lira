@@ -98,11 +98,7 @@ class TestBlockDirective(BaseDirective):
 
 class RSTParser(BaseParser):
 
-    """
-    reStructuredText parser for lira.
-
-    Powered by docutils.
-    """
+    """reStructuredText parser for lira, powered by docutils."""
 
     terminal_nodes = {
         "#text": booknodes.Text,

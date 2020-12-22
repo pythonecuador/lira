@@ -69,7 +69,10 @@ class TestNodes:
         assert node.attributes.description == "I'm a validator"
         assert node.attributes.state == State.UNKNOWN
         assert node.text() == "# Write a comment"
-        assert str(node) == "<TestBlock lira.validators.TestBlockValidator: I'm a validator>"
+        assert (
+            str(node)
+            == "<TestBlock lira.validators.TestBlockValidator: I'm a validator>"
+        )
 
     def test_block_node_reset(self):
         node = nodes.TestBlock(

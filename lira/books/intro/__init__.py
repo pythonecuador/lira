@@ -12,4 +12,4 @@ class LiraValidator(TestBlockValidator):
         if self.tries <= 1:
             self.message = "Awesome, you did it at the first try!"
         else:
-            self.message = f"You did it at the {self.tries} try!"
+            self.message = f"You did it at the try number {self.tries}!"

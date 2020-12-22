@@ -9,5 +9,19 @@ Nodes
 -----
 
 .. automodule:: lira.parsers.nodes
-   :members: Node, Paragraph, Text, Strong, Emphasis, Literal, Section, Admonition, CodeBlock, TestBlock, Prompt
-   :member-order: bysource
+
+   .. autoclass:: Node
+      :members:
+      :member-order: bysource
+
+   .. autoclass:: Paragraph
+   .. autoclass:: Text
+   .. autoclass:: Strong
+   .. autoclass:: Emphasis
+   .. autoclass:: Literal
+   .. autoclass:: Section
+   .. autoclass:: Admonition
+   .. autoclass:: CodeBlock
+   .. autoclass:: TestBlock
+      :members: validate
+   .. autoclass:: Prompt

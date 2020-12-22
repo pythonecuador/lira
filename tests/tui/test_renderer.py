@@ -1,13 +1,11 @@
 from pathlib import Path
 from unittest import mock
 
-from prompt_toolkit.data_structures import Point
 from prompt_toolkit.formatted_text import (
     fragment_list_to_text,
     merge_formatted_text,
     to_formatted_text,
 )
-from prompt_toolkit.mouse_events import MouseEvent, MouseEventType
 
 from lira.book import Book
 from lira.tui.render import Renderer
@@ -73,7 +71,7 @@ This is a Python test block:
 
 ┌─ Write a comment ──────────────────
 
-- [ Edit ] [ Reset ] [ Check ] (•) --
+- [ Edit ] [ Check ] [ Reset ] (•) --
 
   # Put your comment below
 
@@ -94,7 +92,7 @@ This is just plain text:
 
 ┌─ Who is Guido? ────────────────────
 
-- [ Edit ] [ Reset ] [ Check ] (•) --
+- [ Edit ] [ Check ] [ Reset ] (•) --
 
   He's the creator of something...
 
@@ -120,15 +118,14 @@ This is just plain text:
 
         click_edit.return_value = new_text
 
-        mouse_event = MouseEvent(Point(0, 0), MouseEventType.MOUSE_UP)
-        renderer._edit_action(node, mouse_event)
+        renderer._edit_action(node)
         click_edit.assert_called_once_with(
             text=text,
             extension=".txt",
         )
         assert node.text() == new_text
 
-        renderer._reset_action(node, mouse_event)
+        renderer._reset_action(node)
         assert node.text() == text
 
     @mock.patch("lira.tui.render.click.edit")
@@ -144,10 +141,15 @@ This is just plain text:
 
         click_edit.return_value = None
 
-        mouse_event = MouseEvent(Point(0, 0), MouseEventType.MOUSE_UP)
-        renderer._edit_action(node, mouse_event)
+        renderer._edit_action(node)
         click_edit.assert_called_once_with(
             text=text,
             extension=".txt",
         )
         assert node.text() == text
+
+    def test_test_block_reset_action(self):
+        pass
+
+    def test_test_block_check_action(self):
+        pass

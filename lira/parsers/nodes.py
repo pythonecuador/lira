@@ -1,5 +1,7 @@
 from copy import copy
 
+from lira.validators import TestBlockValidator, get_validator_class
+
 
 def _get_attributes_proxy(attributes, **values):
     class AttributesProxy:
@@ -65,8 +67,8 @@ class Node:
 
     def reset(self):
         """Reset attributes and content of the node to their initial values."""
-        self.content = self._initial_content
-        self.attributes = self._initial_attributes
+        self.content = copy(self._initial_content)
+        self.attributes = copy(self._initial_attributes)
 
     def text(self):
         """Text representation of the node."""
@@ -213,7 +215,7 @@ class TestBlock(Node):
 
     Attributes:
 
-    - validator: dotted path to a :py:class:`lira.validator.Validator` class.
+    - validator: dotted path to a :py:class:`lira.validators.TestBlockValidator` class.
     - description
     - state
     - language
@@ -223,8 +225,27 @@ class TestBlock(Node):
     is_terminal = True
     valid_attributes = {"validator", "description", "state", "language", "extension"}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._validator = self._get_validator()
+
+    def _get_validator(self):
+        class_ = get_validator_class(
+            validator_path=self.attributes.validator,
+            subclass=TestBlockValidator,
+        )
+        return class_(node=self)
+
     def text(self):
         return "\n".join(self.content)
+
+    def reset(self):
+        super().reset()
+        self._validator = self._get_validator()
+
+    def validate(self):
+        """Run the validator for this node."""
+        return self._validator.run()
 
     def __repr__(self):
         description = self.attributes.description

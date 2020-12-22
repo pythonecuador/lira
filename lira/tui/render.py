@@ -1,5 +1,5 @@
 import logging
-from functools import partial
+from functools import partial, wraps
 from textwrap import indent
 
 import click
@@ -12,6 +12,17 @@ from lira.parsers import State
 from lira.tui.utils import copy_to_clipboard, get_lexer, notify_after_copy
 
 log = logging.getLogger(__name__)
+
+
+def action(func, *args, **kwargs):
+    """Decorate a method as an action to be executed on click or select."""
+
+    @wraps(func)
+    def _handler(mouse_event):
+        if mouse_event.event_type == MouseEventType.MOUSE_UP:
+            func(*args, **kwargs)
+
+    return _handler
 
 
 class Renderer:
@@ -172,9 +183,9 @@ class Renderer:
         )
         menu = self._render_menu(
             [
-                ("Edit", partial(self._edit_action, node)),
-                ("Reset", partial(self._reset_action, node)),
-                ("Check", lambda x: None),
+                ("Edit", action(self._edit_action, node)),
+                ("Check", action(self._check_action, node)),
+                ("Reset", action(self._reset_action, node)),
             ],
             state=node.attributes.state,
         )
@@ -186,21 +197,30 @@ class Renderer:
         seperator = to_formatted_text("\n\n")
         return [top, seperator, menu, seperator, content, seperator, bottom]
 
-    def _copy_action(self, node, mouse_event):
+    def notify(self, msg):
+        self.tui.status.notify(msg, delay=2.5)
+
+    def _check_action(self, node):
+        validator = node.validate()
+        if validator.message:
+            self.notify(validator.message)
+        self.tui.content.update_section(self.section)
+
+    def _copy_action(self, node):
         text = node.text()
         if text:
             copy_to_clipboard(text)
             notify_after_copy(self.tui, text)
 
-    def _reset_action(self, node, mouse_event):
-        if mouse_event.event_type == MouseEventType.MOUSE_UP:
-            node.reset()
-            self.tui.content.update_section(self.section)
+    def _reset_action(self, node):
+        node.reset()
+        self.tui.content.update_section(self.section)
+        msg = "Let's try again"
+        self.notify(msg)
 
-    def _edit_action(self, node, mouse_event):
-        if mouse_event.event_type == MouseEventType.MOUSE_UP:
-            self._open_editor(node)
-            self.tui.content.update_section(self.section)
+    def _edit_action(self, node):
+        self._open_editor(node)
+        self.tui.content.update_section(self.section)
 
     def _open_editor(self, node):
         """

@@ -18,7 +18,7 @@ setuptools.setup(
     package_data={"lira": ["*.rst"]},
     install_requires=[
         "docutils==0.16",
-        "PyYAML==5.3.1",
+        "PyYAML==5.4",
         "prompt-toolkit==3.0.7",
         "Pygments==2.7.2",
         "pyperclip==1.8.1",

@@ -20,7 +20,7 @@ setuptools.setup(
         "docutils==0.16",
         "PyYAML==5.4",
         "prompt-toolkit==3.0.7",
-        "Pygments==2.7.2",
+        "Pygments==2.7.4",
         "pyperclip==1.8.1",
         "click==7.1.2",
     ],
